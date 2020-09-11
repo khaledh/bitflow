@@ -22,6 +22,7 @@ Let's take a look at the memory layout at this point (note that the memory start
             start   - end      size   desription
 -------------------------------------------------------------------------------
  1,048,576 0x100000 -                 Unaddressable memory in real mode
+------------------------ Top of Address Space (1024K) -------------------------
  1,048,574  0xFFFFE - 0xFFFFF (   2B) BIOS Entry Point
    983,040  0xF0000 - 0xFFFFD ( ~64K) BIOS ROM
    819,200  0xC8000 - 0xEFFFF ( 160K) Memory-mapped ISA Hardware (or no memory)
@@ -29,7 +30,7 @@ Let's take a look at the memory layout at this point (note that the memory start
    753,664  0xB8000 - 0xBFFFF (  32K) Video RAM for Color Text Mode
    720,896  0xB0000 - 0xB7FFF (  32K) Video RAM for Monochrome Text Mode
    655,360  0xA0000 - 0xAFFFF (  64K) Video RAM for Graphics Mode
-------------------------- Top of RAM ------------------------------------------
+---------------------------- Top of RAM (640K) --------------------------------
    654,336  0x9FC00 - 0x9FFFF (   1K) Extended BIOS Data Area (EBDA)
     32,256  0x07E00 - 0x9FBFF (~622K) Free memory
     31,744  0x07C00 - 0x07DFF ( 512B) Boot Sector
