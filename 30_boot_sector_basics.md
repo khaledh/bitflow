@@ -137,3 +137,6 @@ Let's recap:
 * We learned how to add the magic two bytes at the end of the boot sector so that BIOS can recognize it as bootable.
 * We learned how to inspect the state of the CPU (specifically the `eip` register) while running in QEMU.
 * We learned how to add two machine code instructions to the boot sector to halt the CPU.
+
+Next:
+* It's going to be extremely tedious to write machine code by hand. We need to start using an assembler to do that for us.

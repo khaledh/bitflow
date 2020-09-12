@@ -43,8 +43,11 @@ Booting from Hard Disk...
 B
 ```
 
-Success!
+Success! We might be tempted to continue along this path and write a routine to display a string, including numbers (decimal and hex), but we'll save that until we actually need it.
 
 Let's recap:
 * We learned about the BIOS interrupts and the Interrupt Vector Table.
 * We learned how to display a character on screen using the BIOS video interrupt `INT 10h`.
+
+Next:
+* The boot sector size is very limited; it is meant only as a bootstrapping mechanism to load a more fleshed out boot loader, or load a kernel directly if we don't need a fancy boot loader.

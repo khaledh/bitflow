@@ -83,3 +83,6 @@ Let's recap:
 * We learned how to write a simple assembly program and assemble it using NASM.
 * We learned how to reserve space using `db` and the `times` prefix.
 * We learned how to make the reserved space dynamic based on the contents of the file.
+
+Next:
+* We can't keep relying on the QEMO monitor to check/debug the state of the machine. We'll need some way to display information on screen.
