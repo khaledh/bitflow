@@ -110,7 +110,9 @@ Let's boot our image again and inspect the `eip` register:
 0000000000006805: 0x2607fa84
 ```
 
-We still ended up at the same random address. What's going on here may not be obvious right away, but basically the CPU can get out of the halt state if it receives an interrupt. So we need to disable interrupts before we halt the CPU. The instruction to disable interrupts is `cli` (for clear interrupt flag), and its opcode is `FA`. So let's modify our boot sector to have those two instructions in sequence (`cli` followed by `hlt`):
+We still ended up at the same random address. What's going on here may not be obvious right away, but basically the CPU can get out of the halt state if it receives an interrupt. So we need to disable interrupts before we halt the CPU[^2]. The instruction to disable interrupts is `cli` (for clear interrupt flag), and its opcode is `FA`. So let's modify our boot sector to have those two instructions in sequence (`cli` followed by `hlt`):
+
+[^2]: We can only disable maskable interrupts. Non-Maskable Interrupts (NMI) can always interrupt the CPU. But we won't worry about this now.
 
 ```
 $ echo "0: FAF4" | xxd -r - bootsect.img
