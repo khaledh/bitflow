@@ -56,6 +56,25 @@ The location just before the magic number is easy; it's 510. We can get the loca
     db 0x55, 0xAA
 ```
 
+Unfortunately assembling this will produce the following error:
+
+```
+$ nasm -o bootsect.img bootsect.asm
+bootsect.asm:6: error: non-constant argument supplied to TIMES
+```
+
+The reason is that NASM needs to determine the size of all assembled code and data _before_ it can generate the symbol addresses (including the special symbol `$`) the code refers to. When NASM hits the `times` line, it finds the absolute reference `$` and rejects it. If we tell NASM that we're interested in the _relative difference_ between the current position and the beginning of the code, then it would happily calculate that for us. Fortunately, NASM supports the symbol `$$` to refer to the beginning of the current section, so we can just use the expression `$ - $$` to turn the absolute reference into a relative one:
+
+```
+;   bootsect.asm
+
+    cli
+    hlt
+
+    times 510-($-$$) db 0
+    db 0x55, 0xAA
+```
+
 This will produce exactly the same thing as the hard-coded version, but is now dynamic based on the contents of the file[^2].
 
 [^2]: Readers familiar with the `org` directive will know that we're not done yet. But I'm leaving this until we need it.
