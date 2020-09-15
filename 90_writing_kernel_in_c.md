@@ -10,7 +10,7 @@ Our lives will be much easier if we use a GCC cross-compiler. The default compil
 
 So we should get a cross-compiled GCC that targets i386-elf. For Mac, you can get a pre-built toolchair through homebrew: [homebrew-i386-elf-toolchain](https://github.com/nativeos/homebrew-i386-elf-toolchain). On Windows, we can use WSL to build a cross-compiled GCC under Linux. This [tutorial](http://learnitonweb.com/2019/12/09/6-cross-compiler-gcc-on-windows-10-using-wsl-windows-subsystem-for-linux/) should be helpful.
 
-I also like to setup aliases to the common tools (e.g. `gcc`, `ld`, etc) that use the cross-compiled version of GCC while working inside my project directory. This bash snippet should do the trick:
+I also like to setup aliases to the common tools (e.g. `gcc`, `ld`, etc) that use the cross-compiled version of GCC while working inside my project directory. This bash snippet should do the trick (make sure you source it only when working on this project, otherwise it will override your system's toolchain commands):
 
 ```bash
 export PATH=/usr/local/Cellar/i386-elf-gcc/9.2.0/bin:/usr/local/Cellar/i386-elf-binutils/2.31/bin:$PATH
@@ -91,7 +91,7 @@ $ ld --oformat=binary kernel.o -o kernel.img
 i386-elf-ld: warning: cannot find entry symbol _start; defaulting to 0000000008048000
 ```
 
-While this worked, the linker produced a warning that it cannot find the default entry point symbol called `_start`. This symbol is usually provided by the C runtime, but since we're not relying on a runtime, we can tell the linker to use our kernel `kmain` function symbol as the entry point:
+While this worked, the linker produced a warning that it cannot find the default entry point symbol called `_start`. This symbol is usually provided by the C runtime startup routine, which eventually call's the typical C `main` function. We can ignore this warning since we're not relying on an ELF loader; we'll jump to our kernel's entry point directly from the boot loader. However, it's better to get rid of the wraning, so let's tell the linker to use our kernel `kmain` function symbol as the entry point (not that this changes anything, but just to keep the linker happy):
 
 ```
 $ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
@@ -99,10 +99,10 @@ $ file kernel.img
 kernel: data
 ```
 
-This time we don't get any warning. When we inspect the file type we're told it's just "data", i.e. raw binary. Ideally our kernel should contain only the machine instructions corresponding to the `kmain` function. Let's disassemble it and see:
+This time we don't get any warning. When we inspect the file type we're told it's just "data", i.e. raw binary. Ideally our kernel should contain only the machine instructions corresponding to the `kmain` function. Let's disassemble it and see (the `-u` option is a more compact version of `-b 32`):
 
 ```
-$ ndisasm -b 32 kernel.img
+$ ndisasm -u kernel.img
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -130,7 +130,7 @@ Idx Name          Size      VMA       LMA       File off  Algn  Flags
   3 .comment      00000012  00000000  00000000  00000039  2**0  CONTENTS, READONLY
 
 $ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-$ ndisasm -b 32 kernel.img
+$ ndisasm -u kernel.img
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -153,7 +153,7 @@ It looks like the compiler is telling the linker to link the C runtime library, 
 
 ```
 $ gcc -nostdlib -fno-asynchronous-unwind-tables -Wl,--oformat=binary -Wl,--entry=kmain kernel.c -o kernel.img
-$ ndisasm -b 32 kernel.img
+$ ndisasm -u kernel.img
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -166,7 +166,7 @@ We can also use the `objcopy` to extract the `.text` section of the object file.
 ```
 $ gcc -c kernel.c -o kernel.o
 $ objcopy j .text -O binary kernel.o kernel.img
-$ ndisasm -b 32 kernel.img
+$ ndisasm -u kernel.img
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -174,7 +174,7 @@ $ ndisasm -b 32 kernel.img
 
 Notice that in this case we didn't have to use any special compiler options, and we didn't have to use the linker. That's because with `objcopy` we can select the specific sections we want in the output.
 
-### Running the kernel
+### Loading the kernel
 
 Let's put together our boot sector and our new 32-bit kernel.
 
@@ -201,20 +201,22 @@ Let's modify our kernel to output the character `K` directly to video memory.
 // kernel.c
 
 #define VIDEO_MEMORY       0xB8000
-#define LIGHTGRAY_ON_BLACK 0x07
+#define WHITE_ON_LIGHTBLUE 0x9F
 
 void kmain() {
-    *((unsigned short *)VIDEO_MEMORY) = (LIGHTGRAY_ON_BLACK << 8) + 'K';
+    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
     for(;;);
 }
 ```
 
 Let's compile and see what the binary looks like[^1].
 
+[^1]: Don't worry, we'll tidy up things soon by moving those repetitive commands to a `Makefile`.
+
 ```
 $ gcc -fno-asynchronous-unwind-tables -c kernel.c -o kernel.o
 $ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-$ ndisasm -b 32 kernel.img
+$ ndisasm -u kernel.img
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  B800800B00        mov eax,0xb8000
@@ -234,17 +236,37 @@ Booting from Hard Disk...
 B
 ```
 
-There's our `K` letter at the top-left of the screen.
+There's our `K` letter in at the top-left of the screen in white-over-lightblue color.
 
-Let's recap:
+### Halt the CPU
+
+One last thing I'd like to do before we end this section is to halt the CPU at the end of the `kmain` function instead of pegging the CPU with an infinite loop. In order to do this, we'll need to embed assembly instructins within our C program. Fortunately GCC allows us to do this easily using the `asm` keyword.
+
+```c
+// kernel.c
+
+#define VIDEO_MEMORY       0xB8000
+#define WHITE_ON_LIGHTBLUE 0x9F
+
+void kmain() {
+    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+
+    asm("cli \n"
+        "hlt");
+}
+```
+
+There's more to learn about inline assembly syntax (e.g. how to pass and receive variables through registers/memory), but we'll leave that till we need it.
+
+### Recap
+
 * We setup our C development environment using a cross-compiled GCC.
 * We compiled a simple C kernel and learned a bit about the ELF format sections.
 * We learned how to disassemble a specific ELF section.
 * We learned about loadable sections and how to avoid producing unneeded runtime sections.
 * We learned multiple ways of producing a flat binary kernel.
 * We made the kernel output a character to screen by writing directly to video memory.
+* We embedded assembly instructions in our C kernel to halt the CPU.
 
-Next:
-* It's getting tedious typing the same commands over and over. Let's tidy up things a bit by creating a `Makefile` to help streamline our workflow.
-
-[^1]: Don't worry, we'll tidy up things soon by moving those repetitive commands to a `Makefile`.
+### Next
+It's getting tedious typing the same commands over and over. Let's tidy up things a bit by creating a `Makefile` to help streamline our workflow.
