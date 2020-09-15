@@ -1,0 +1,4 @@
+alias qemu="qemu-system-i386 -nic none"
+for cmd in gcc ar as ld nm objcopy objdump readelf size strings strip; do
+    alias $cmd="i386-elf-$cmd"
+done
