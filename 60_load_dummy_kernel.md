@@ -15,7 +15,9 @@ We need a few things:
 
 ### Create a dummy kernel
 
-Let's copy our boot sector code to a new file and modify a bit to be our dummy kernel:
+Let's copy our boot sector code to a new file and modify a bit to be our dummy kernel[^2]:
+
+[^2]: Once we start declaring and referring to symbols in our kernel, we'll need to let the assembler know its origin address, i.e. set the `org` directive. I'm leaving this out until we need it.
 
 ```
 ;   kernel.asm
@@ -156,7 +158,7 @@ Let's check the memory area at `0x7E00` (the `/5i` is a format specifier that te
 0x00007e00:  f4                       hlt
 ```
 
-That's our dummy kernel code![^2]
+That's our dummy kernel code![^3]
 
 ### Transfer control to the kernel
 
@@ -207,4 +209,4 @@ Next:
 *[EBDA]: Extended BIOS Data Area
 
 [^1]: We can load a small second stage boot loader at the either boundary of the free memory area, which can load our kernel into a larger contiguous memory area. But it's not worth it at this point since our kernel will be small enough in the beginning.
-[^2]: The syntax of the instructions looks a bit different because QEMU diassembles instructions the AT&T syntax, while we have been using the Intel syntax.
+[^3]: The syntax of the instructions looks a bit different because QEMU diassembles instructions the AT&T syntax, while we have been using the Intel syntax.
