@@ -36,7 +36,7 @@ void kmain() {
     clear_screen();
 
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     task();
 
@@ -53,7 +53,7 @@ void clear_screen() {
 
 void task() {
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) + 'T';
+    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) | 'T';
 }
 ```
 
@@ -90,7 +90,7 @@ Since we're also a bit far away from reading from disk, let's do a simpler thing
 
 void task() {
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) + 'T';
+    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) | 'T';
 }
 ```
 
@@ -106,7 +106,7 @@ void kmain() {
     clear_screen();
 
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     task();
 
@@ -257,7 +257,7 @@ void kmain() {
     clear_screen();
 
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     load_task((uint8_t*)TASK_LOAD_ADDR);
     task_t task = (task_t)TASK_LOAD_ADDR;

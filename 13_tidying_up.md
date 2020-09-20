@@ -96,7 +96,7 @@ void clear_screen() {
 
 void put_char(char ch, char attr, int row, int col) {
     int offset = row * SCREEN_ROWS + col;
-    *(video_memory + offset) = (attr << 8) + ch;
+    *(video_memory + offset) = (attr << 8) | ch;
 }
 ```
 
@@ -236,3 +236,7 @@ B
 * We tidied up our code by moving functions to dedicated modules: cpu, screen, and task.
 * We linked all kernel modules right after the main kernel module.
 * We learned that we cannot call kernel functions directly from loaded tasks.
+
+### Next
+
+We've made it so far without printing much to screen. We're going to take a break from tasks and add a screen routine to display strings and numbers (both in decimal and hex), which should help us put more detailed info on screen about what the kernel is doing.

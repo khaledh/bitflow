@@ -14,7 +14,7 @@ Let's start by adding renaming our existing task from `task.c` to `task_a.c`, an
 
 void task_a() {
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) + 'A';
+    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) | 'A';
 }
 ```
 
@@ -25,7 +25,7 @@ void task_a() {
 
 void task_b() {
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory + (2 * 80)) = (WHITE_ON_LIGHTBLUE << 8) + 'B';
+    *(video_memory + (2 * 80)) = (WHITE_ON_LIGHTBLUE << 8) | 'B';
 }
 ```
 

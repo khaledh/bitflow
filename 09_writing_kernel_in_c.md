@@ -204,7 +204,7 @@ Let's modify our kernel to output the character `K` directly to video memory.
 #define WHITE_ON_LIGHTBLUE 0x9F
 
 void kmain() {
-    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
     for(;;);
 }
 ```
@@ -249,7 +249,7 @@ One last thing I'd like to do before we end this section is to halt the CPU at t
 #define WHITE_ON_LIGHTBLUE 0x9F
 
 void kmain() {
-    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     asm("cli \n"
         "hlt");

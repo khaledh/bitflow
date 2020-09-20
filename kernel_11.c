@@ -12,7 +12,7 @@ void kmain() {
     clear_screen();
 
     unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *(video_memory) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     task_t task = (task_t)TASK_LOAD_ADDR;
 

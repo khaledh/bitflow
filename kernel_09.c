@@ -2,7 +2,7 @@
 #define WHITE_ON_LIGHTBLUE 0x9F
 
 void kmain() {
-    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) + 'K';
+    *((unsigned short *)VIDEO_MEMORY) = (WHITE_ON_LIGHTBLUE << 8) | 'K';
 
     asm("cli \n"
         "hlt");
