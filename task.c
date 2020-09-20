@@ -1,6 +1,29 @@
-#include "kernel.h"
+#include <stdint.h>
+#include "task.h"
+#include "screen.h"
+#include "cpu.h"
 
-void task() {
-    unsigned short* video_memory = (unsigned short*)VIDEO_MEMORY;
-    *(video_memory + 80) = (WHITE_ON_LIGHTBLUE << 8) + 'T';
+#define TASK_LOAD_ADDR 0xa000
+#define TASK_SIZE 512
+
+typedef uint8_t task_block_t[TASK_SIZE];
+typedef void (*task_t)(void);
+
+extern task_block_t __tasks_start;
+task_block_t* tasks_base = &__tasks_start;
+
+void load_task(int task_index, uint8_t* dst) {
+    uint8_t* src = (uint8_t*)(tasks_base + task_index);
+    for (int i = 0; i < TASK_SIZE; i++) {
+        dst[i] = src[i];
+    }
+}
+
+void exec(int task_index) {
+    task_t task = (task_t)TASK_LOAD_ADDR;
+    put_char('L', WHITE_ON_LIGHTBLUE, 5, 0);
+    // load and execute task
+    load_task(task_index, (uint8_t*)TASK_LOAD_ADDR);
+    put_char('E', WHITE_ON_LIGHTBLUE, 5, 1);
+    task();
 }

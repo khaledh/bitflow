@@ -13,7 +13,7 @@
     ; load a one-sector dummy kernel
     ;
     mov    ah, 2                 ; INT 13,2 Read Disk Sectors
-    mov    al, 2                 ; read two sectors
+    mov    al, 16                ; read n sectors
     mov    ch, 0                 ; first track/cylinder
     mov    cl, 2                 ; second sector (sector numbers are 1-based)
     mov    dh, 0                 ; first head

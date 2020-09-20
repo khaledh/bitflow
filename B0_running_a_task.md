@@ -182,6 +182,8 @@ What we want to do instead is to assign two fixed-size 512b memory blocks, one f
 Let's create the linker script to specify such a memory layout.
 
 ```
+/* linker.ld */
+
 SECTIONS
 {
     .kernel 0x7e00 :
@@ -202,6 +204,24 @@ SECTIONS
 We create two output sections:
 * A `.kernel` section which starts at address `0x7e00` (kernel entry point). This section contains the `.text` and `.data` sections from the `kernel.o` object file, and is padded to 512b.
 * A `.tasks` section which starts after the padded kernel (i.e. at `0x8000`). Similar to the `.kernel` section, this section contains the `.text` and `.data` sections from the `task.o` object file, and is padded to 512b.
+
+Before we forget, let's use tell `ld` to use this linker script instead of the default one.
+
+```makefile
+# Makefile
+
+...
+
+OBJECTS := kernel.o task.o
+
+...
+
+kernel.img: $(OBJECTS) linker.ld
+	$(LD) $(LDFLAGS) $(OBJECTS) -T linker.ld -o $@
+...
+```
+
+Since we want to pass `linker.ld` using the `-T` parameter, we can't use the `$^` automatic variable anymore; otherwise the `linker.ld` file will be added to the list of object files to be linked. Instead, we use a variable to hold the object file names and pass that intead.
 
 Let's add a `load_task()` function to our kernel that will copy the task 512b block to a given destination address.
 
