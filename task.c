@@ -21,9 +21,8 @@ void load_task(int task_index, uint8_t* dst) {
 
 void exec(int task_index) {
     task_t task = (task_t)TASK_LOAD_ADDR;
-    put_char('L', WHITE_ON_LIGHTBLUE, 5, 0);
+
     // load and execute task
     load_task(task_index, (uint8_t*)TASK_LOAD_ADDR);
-    put_char('E', WHITE_ON_LIGHTBLUE, 5, 1);
     task();
 }
