@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "kernel.h"
-#include "screen.h"
+#include "console.h"
 #include "task.h"
 #include "cpu.h"
 

@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include "task.h"
-#include "screen.h"
+#include "console.h"
 #include "cpu.h"
 
 #define TASK_LOAD_ADDR 0xa000

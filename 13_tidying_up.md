@@ -63,10 +63,10 @@ void kmain() {
 
 ### Screen Routines
 
-We have code that outputs a character to screen, as well as a function that clears the screen. Let's move that code to a `screen.c` module.
+We have code that outputs a character to screen, as well as a function that clears the screen. Let's move that code to a `console.c` module.
 
 ```c
-// screen.h
+// console.h
 
 #pragma once
 
@@ -77,10 +77,10 @@ void put_char(char ch, char attr, int row, int col);
 ```
 
 ```c
-// screen.c
+// console.c
 
 #include <stdint.h>
-#include "screen.h"
+#include "console.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25
@@ -105,7 +105,7 @@ While we can call the `put_char()` function from the kernel, unfortunately we wo
 ```c
 // kernel.c
 
-#include "screen.h"
+#include "console.h"
 
 void kmain() {
     clear_screen();
@@ -148,7 +148,7 @@ Let's take a look at our final `kernel.c` after this refactoring.
 // kernel.c
 
 #include "kernel.h"
-#include "screen.h"
+#include "console.h"
 #include "task.h"
 
 void kmain() {
@@ -175,7 +175,7 @@ Let's not forget to update our `Makefile` to include all those new modules.
 
 ...
 
-OBJECTS := kernel.o cpu.o screen.o task.o task_a.o task_b.o
+OBJECTS := kernel.o cpu.o console.o task.o task_a.o task_b.o
 ...
 
 %.o: %.c
@@ -200,7 +200,7 @@ SECTIONS
 {
     .kernel 0x7e00 :
     {
-        kernel.o(.text .data)
+        kernel.o(.text .data .rodata)
         EXCLUDE_FILE (task_*.o) *(.text .data .rodata)
         . = ALIGN(512);
     }
@@ -208,16 +208,16 @@ SECTIONS
     __tasks_start = .;
     .tasks :
     {
-        task_a.o (.text .data)
+        task_a.o (.text .data .rodata)
         . = ALIGN(512);
 
-        task_b.o (.text .data)
+        task_b.o (.text .data .rodata)
         . = ALIGN(512);
     }
 }
 ```
 
-We first output the kernel sections, followed by all the other kernel modules sections. Notice that we use the `EXCLUDE_FILE` command to exclude the task object files at this point; otherwise they will end up being output the `.kernel` section. Notice also that we added another section `.rodata` to the list of sections of the kernel modules. This is needed for the `screen.o` module, as we added a global constant (the video memory pointer) which ends up being in a read-only data section called `.rodata`.
+We first output the kernel sections, followed by all the other kernel modules sections. Notice that we use the `EXCLUDE_FILE` command to exclude the task object files at this point; otherwise they will end up being output the `.kernel` section.
 
 Let's build and run everything.
 

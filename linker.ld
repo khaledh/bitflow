@@ -10,10 +10,10 @@ SECTIONS
     __tasks_start = .;
     .tasks :
     {
-        task_a.o (.text .data)
+        task_a.o (.text .data .rodata)
         . = ALIGN(512);
 
-        task_b.o (.text .data)
+        task_b.o (.text .data .rodata)
         . = ALIGN(512);
     }
 }

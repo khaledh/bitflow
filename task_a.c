@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include "screen.h"
+#include "console.h"
 
 void task_a() {
-    *((uint16_t*)0xB8000 + 80) = (WHITE_ON_BLUE << 8) | 'A';
+    kput_str("Task A", WHITE_ON_BLUE, 1, 0);
 }

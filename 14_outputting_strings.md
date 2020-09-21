@@ -5,7 +5,7 @@
 Let's add a `put_str` function to the screen module to output a string at a particular position on screen.
 
 ```c
-// screen.c
+// console.c
 
 ...
 
@@ -19,7 +19,7 @@ void put_str(char* str, char attr, int row, int col) {
 Let's also define all the text mode colors so that callers can use them individually if needed.
 
 ```c
-// screen.h
+// console.h
 
 #pragma once
 
@@ -72,7 +72,7 @@ B
 We are able to output strings at an absolute position on screen. However, having to specify the screen position every time we just want to output something is going to be tedious. What we need is a way to output text in a "flow" mode; i.e. keep track of the next position to output text, and update it after every output operation. Let's add two new functions equivalent to `write_char` and `write_str` without the position arguments.
 
 ```c
-// screen.h
+// console.h
 
 uint8_t current_offset = 0;
 
@@ -92,7 +92,7 @@ void write_str(char* str, char attr) {
 Notice that we're starting to have duplication between the `put_*` functions and their equivalent `write_*`. Let's refactor things a bit to remove that duplication.
 
 ```c
-// screen.h
+// console.h
 
 #define OFFSET(row, col) (row * SCREEN_COLS + col)
 ...

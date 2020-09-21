@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "screen.h"
+#include "console.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25
@@ -48,3 +48,9 @@ void write_char(char ch, char attr) {
 void write_str(char* str, char attr) {
     current_offset = put_str_at(str, attr, current_offset);
 }
+
+void (*kclear_screen)() = clear_screen;
+void (*kput_char)(char ch, char attr, int row, int col) = put_char;
+void (*kput_str)(char* str, char attr, int row, int col) = put_str;
+void (*kwrite_char)(char ch, char attr) = write_char;
+void (*kwrite_str)(char* str, char attr) = write_str;
