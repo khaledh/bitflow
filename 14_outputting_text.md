@@ -1,8 +1,8 @@
-# Outputting Strings
+# Outputting Text
 
 ### Outputting text at an absolute position
 
-Let's add a `put_str` function to the screen module to output a string at a particular position on screen.
+Let's add a `put_str` function to the console module to output a string at a particular position on screen.
 
 ```c
 // console.c
