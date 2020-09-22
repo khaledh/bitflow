@@ -23,7 +23,7 @@ kernel.img: $(OBJS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJS) -T linker.ld -o $@
 
 run: os.img
-	$(QEMU) -nic none -drive file=$<,format=raw
+	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio
 
 clean:
 	$(RM) $(OBJS) $(DEPS) *.img
