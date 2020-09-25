@@ -193,3 +193,12 @@ Success! We can see the messages from both tasks, in different colors, just as w
 * We used a function pointer to the kernel function we want to call from a task to force an absolute address call.
 * We learned how to inspect the generated assembly code and follow the call indirection through the pointer variable.
 * We generated a link map to verify the function address is correct.
+
+### Next
+
+So far we are linking user tasks with the kernel, which allowed us to pretend they're separate while we prototype a few ideas, namely:
+- loading: the krenel loads tasks into a memory area
+- executing: the kernel transfers control to the task and regains it when the task ends
+- calling kernel functions: once the task is running, it may call upon the kernel to execute a certain service on its behalf
+   
+We need to go one step further and remove user tasks from the kernel image, and store the task as a separate image on the hard disk image. This is going to require the kernel to actually load the task image from disk. And that's what we'll be doing next: writing a simple disk driver.

@@ -49,6 +49,10 @@ void write_str(char* str, char attr) {
     current_offset = put_str_at(str, attr, current_offset);
 }
 
+void print(char* str) {
+    write_str(str, DEFAULT_COLOR);
+}
+
 void (*kclear_screen)() = clear_screen;
 void (*kput_char)(char ch, char attr, int row, int col) = put_char;
 void (*kput_str)(char* str, char attr, int row, int col) = put_str;

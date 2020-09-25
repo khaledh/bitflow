@@ -21,12 +21,14 @@
 #define GRAY_LT_ON_BLACK (BLACK << 4 | GRAY_LT)
 #define WHITE_ON_BLUE    (BLUE << 4 | WHITE)
 #define BROWN_ON_GRAY_LT (GRAY_LT << 4 | BROWN)
+#define DEFAULT_COLOR    GRAY_LT_ON_BLACK
 
 void clear_screen();
 void put_char(char ch, char attr, int row, int col);
 void put_str(char* str, char attr, int row, int col);
 void write_char(char ch, char attr);
 void write_str(char* str, char attr);
+void print(char* str);
 
 extern void (*kclear_screen)();
 extern void (*kput_char)(char ch, char attr, int row, int col);

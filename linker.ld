@@ -2,8 +2,10 @@ SECTIONS
 {
     .kernel 0x7e00 :
     {
-        kernel.o(.text .data .rodata)
-        EXCLUDE_FILE (task_*.o) *(.text .data .rodata)
+        kernel.o(.text)
+        EXCLUDE_FILE (task_*.o) *(.text)
+        kernel.o(.data .rodata)
+        EXCLUDE_FILE (task_*.o) *(.data .rodata)
         . = ALIGN(512);
     }
 
