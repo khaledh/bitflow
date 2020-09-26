@@ -1,6 +1,6 @@
-# Loading Tasks from Disk
+# Loading Tasks from Disk &mdash; Part 1
 
-To further decouple tasks from the kernel, we're going to compile them separately, create a partial disk image from their object output, and store them in the overall disk image after the kernel image.
+To further decouple tasks from the kernel, we're going to compile them separately, create a binary from their object output, and store them in the overall disk image after the kernel binary.
 
 But before we get to that point, we'll need to write a simple disk driver that knows how to talk to the disk controller to load disk sectrs into memory. We were able to do this in real mode through a BIOS interrupt, but in protected mode we're on our own. Let's first learn what the disk interface looks like.
 
@@ -233,14 +233,14 @@ Looks like they match. We have successfully loaded a sector from disk into memor
 
 ### Loading and executing tasks
 
-Now that we're able to load disk sectors, let's load the sectors containing the two tasks and execute them. First, we need to know which sectors contain the two tasks. Fortunately we have everything aligned at 512 bytes, which is the sector size, so our various parts of the disk image start and end on sector boundaries. Our boot sector is 1 sector in size, and so is each of task a and task b. The kernel image has grown over time, so let's check its size to see how many sectors it's taking. We still have the two tasks linked in the kernel image, so we'll need to exclude their size to find the actual kernel image size.
+Now that we're able to load disk sectors, let's load the sectors containing the two tasks and execute them. First, we need to know which sectors contain the two tasks. Fortunately we have everything aligned at 512 bytes, which is the sector size, so our various parts of the disk image start and end on sector boundaries. Our boot sector is 1 sector in size, and so is each of task a and task b. The kernel binary has grown over time, so let's check its size to see how many sectors it's taking. We still have the two tasks linked in the kernel binary, so we'll need to exclude their size to find the actual kernel binary size.
 
 ```
-$ wc -l kernel.img
-    2560 kernel.img
+$ wc -l kernel.bin
+    2560 kernel.bin
 ```
 
-So, knowing that the two tasks are taking 1024 bytes at the end of this image, we can conclude that the kernel image size is 1536 bytes, or 3 sectors. Given this information, let's take a look at our current disk image layout.
+So, knowing that the two tasks are taking 1024 bytes at the end of this binary, we can conclude that the kernel size is 1536 bytes, or 3 sectors. Given this information, let's take a look at our current disk image layout.
 
 ```
   sector        contents

@@ -1,6 +1,6 @@
 # Loading a Dummy Kernel
 
-We have a way to execute a simple boot sector, but it would be futile to build a kernel in just 512 bytes. We need to start thinking about loading a kernel image from disk and transferring control to it. This is our second time communicating with a hardware device, and again we'll rely on the BIOS to help us read from disk.
+We have a way to execute a simple boot sector, but it would be futile to build a kernel in just 512 bytes. We need to start thinking about loading a kernel binary from disk and transferring control to it. This is our second time communicating with a hardware device, and again we'll rely on the BIOS to help us read from disk.
 
 Before we go into the details of calling the BIOS to load our kernel, let's take another look at the memory layout and where the boot sector and the kernel fits in the overall picture (memory areas are not to scale).
 
@@ -9,8 +9,8 @@ Before we go into the details of calling the BIOS to load our kernel, let's take
 The accessible RAM in real-mode is 640K; the area between 640K and 1MB is for memory-mapped hardware/firmware (such as video RAM/ROM and the BIOS ROM). The start of the RAM contains the IVT and the BDA, taking north of 1K. The end of the RAM (just below 640K) contains the EBDA, which is typically 1K in size. Our boot sector is loaded at address `0x7C00` (about 31K into memory). This leaves two areas of free memory for us: about 30K below the boot sector, and about 608K above it. Technically we can think of it as one big area that is 638K in size if we ignore the boot sector, but we'll need to keep the boot sector intact util the kernel is fully loaded into memory[^1]. Let's use the area above the boot sector since it is bigger. Our goal then is to load our kernel immediately after the boot sector, i.e. at `0x7E00`.
 
 We need a few things:
-* a dummy kernel image that does something similar to our simple boot sector to tell us it is working (i.e. display a character on screen),
-* add the dummy kernel image to the overall QEMU disk image, and
+* a dummy kernel binary that does something similar to our simple boot sector to tell us it is working (i.e. display a character on screen),
+* add the dummy kernel binary to the overall QEMU disk image, and
 * a way to ask the BIOS to load the kernel from the disk image into memory.
 
 ### Create a dummy kernel
@@ -30,20 +30,20 @@ Let's copy our boot sector code to a new file and modify a bit to be our dummy k
     hlt
 ```
 
-This will just output the character `K` to screen and halt the CPU. Let's assemble this to generate our dummy kernel image:
+This will just output the character `K` to screen and halt the CPU. Let's assemble this to generate our dummy kernel binary:
 
 ```
-$ nasm -o kernel.img kernel.asm
-$ xxd -a kernel.img
+$ nasm -o kernel.bin kernel.asm
+$ xxd -a kernel.bin
 00000000: b40e b04b cd10 faf4                      ...K....
 ```
 
 ### Add the dummy kernel to the disk image
 
-We now have two separate images: the boot sector image (512 bytes), and the dummy kernel image (512 bytes). We need to append the kernel image after the boot sector image to generate a single disk image for QEMU to use. A simple `cat` should do.
+We now have two separate binaries: the boot sector binary (512 bytes), and the dummy kernel binary (512 bytes). We need to append the kernel binary after the boot sector binary to generate a single disk image for QEMU to use. A simple `cat` should do.
 
 ```
-$ cat bootsect.img kernel.img > os.img
+$ cat bootsect.bin kernel.bin > os.img
 $ xxd -a os.img
 00000000: b40e b042 cd10 b402 b001 b500 b102 b600  ...B............
 00000010: b280 bb00 7ecd 13ea 007e 0000 faf4 0000  ....~....~......
@@ -55,7 +55,7 @@ $ xxd -a os.img
 
 ### Load the dummy kernel
 
-Now we need to lean on the BIOS to load that kernel image into memory for us. The interrupt responsible for disk I/O services is [`INT 13h`](https://stanislavs.org/helppc/int_13.html). This interrupt offers many disk I/O routines; the one we're interested in is `INT 13,02` [Read Disk Sectors](https://stanislavs.org/helppc/int_13-2.html):
+Now we need to lean on the BIOS to load that kernel binary into memory for us. The interrupt responsible for disk I/O services is [`INT 13h`](https://stanislavs.org/helppc/int_13.html). This interrupt offers many disk I/O routines; the one we're interested in is `INT 13,02` [Read Disk Sectors](https://stanislavs.org/helppc/int_13-2.html):
 
 ```
 INT 13,2 - Read Disk Sectors
@@ -127,8 +127,8 @@ Let's modify our boot sector to load the dummy kernel:
 Let's assemble and test it:
 
 ```
-$ nasm -o bootsect.img bootsect.asm
-$ cat bootsect.img kernel.img > os.img
+$ nasm -o bootsect.bin bootsect.asm
+$ cat bootsect.bin kernel.bin > os.img
 $ qemu -drive file=os.img,format=raw
 ```
 ```
@@ -182,8 +182,8 @@ This is called a "far jump" (as opposed to a "near jump"), since we're specifyin
 Let's test it:
 
 ```
-$ nasm -o bootsect.img bootsect.asm
-$ cat bootsect.img kernel.img > os.img
+$ nasm -o bootsect.bin bootsect.asm
+$ cat bootsect.bin kernel.bin > os.img
 $ qemu -drive file=os.img,format=raw
 ```
 ```
@@ -196,7 +196,7 @@ There's our `K` character printed by the dummy kernel! (Remember that the `B` ch
 Let's recap:
 * We learned a bit more about the memory layout in real mode and explored the free memory areas where we can load our kernel.
 * We created a one-sector dummy kernel to be loaded by the boot sector.
-* We combined the boot sector image with the kernel image into one disk image.
+* We combined the boot sector binary with the kernel binary into one disk image.
 * We learned how to use BIOS `INT 13h` to load the kernel's sector from disk.
 * We learned how to manually check that our disk load succeeded using the QEMU monitor.
 * We transferred control to our dummy kernel using a far jump instruction.

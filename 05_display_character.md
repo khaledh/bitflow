@@ -35,8 +35,8 @@ Let's add call this interrupt routine at the beginning of our boot sector to dis
 Let's try this out:
 
 ```
-$ nasm -o bootsect.img bootsect.asm
-$ qemu -drive file=bootsect.img,format=raw
+$ nasm -o bootsect.bin bootsect.asm
+$ qemu -drive file=bootsect.bin,format=raw
 ```
 ```
 Booting from Hard Disk...

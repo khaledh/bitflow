@@ -135,10 +135,10 @@ QEMU := qemu-system-i386
 CFLAGS := -g -fno-asynchronous-unwind-tables
 LDFLAGS := --oformat=binary --entry=kmain 
 
-os.img: bootsect.img kernel.img
+os.img: bootsect.bin kernel.bin
 	cat $^ > os.img
 
-bootsect.img: bootsect.asm
+bootsect.bin: bootsect.asm
 	$(NASM) $< -o $@
 
 kernel.o: kernel.c
@@ -147,14 +147,14 @@ kernel.o: kernel.c
 task.o: task.c
 	$(GCC) $(CFLAGS) -c $< -o $@
 
-kernel.img: kernel.o task.o
+kernel.bin: kernel.o task.o
 	$(LD) $(LDFLAGS) $^ -o $@
 
 run: os.img
 	$(QEMU) -nic none -drive file=$<,format=raw
 
 clean:
-	rm *.o *.img
+	rm *.o *.bin
 ```
 
 We compile `task.c` to `task.o`, and link it _after_ `kernel.o` in the final output. Again, it's important that the kernel entry point be the first thing in the output (we'll make this less relevant later). If you test this you'll get the same output as before.
@@ -216,7 +216,7 @@ OBJECTS := kernel.o task.o
 
 ...
 
-kernel.img: $(OBJECTS) linker.ld
+kernel.bin: $(OBJECTS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJECTS) -T linker.ld -o $@
 ...
 ```

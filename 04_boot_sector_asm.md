@@ -30,8 +30,8 @@ Since each of the first two instructions uses one byte, and the magic number is 
 Let's assemble this file and inspect the output using `xxd`:
 
 ```
-$ nasm -o bootsect.img bootsect.asm
-$ xxd -a bootsect.img
+$ nasm -o bootsect.bin bootsect.asm
+$ xxd -a bootsect.bin
 00000000: faf4 0000 0000 0000 0000 0000 0000 0000  ................
 00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 *
@@ -59,7 +59,7 @@ The location just before the magic number is easy; it's 510. We can get the loca
 Unfortunately assembling this will produce the following error:
 
 ```
-$ nasm -o bootsect.img bootsect.asm
+$ nasm -o bootsect.bin bootsect.asm
 bootsect.asm:6: error: non-constant argument supplied to TIMES
 ```
 

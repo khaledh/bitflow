@@ -1,3 +1,41 @@
+# Loading Tasks from Disk &mdash; Part 2
+
+Our goal now is to compile and link tasks separate from the kernel. We'll generate binary from each task and append them to the overall disk image right after the kernel.
+
+In order to do so, we'll need to prepare a separate linker script for task linking. Let's remove that part of the original linker script and move it to a new file.
+
+```
+/* kernel.ld */
+
+SECTIONS
+{
+    .kernel 0x7e00 :
+    {
+        kernel.o(.text .data .rodata)
+        *(.text .data .rodata)
+        . = ALIGN(512);
+    }
+}
+```
+
+```
+/* task.ld */
+
+SECTIONS
+{
+    .task :
+    {
+        *(.text .data .rodata)
+        . = ALIGN(512);
+    }
+}
+```
+
+Let's make corresponding changes to the `Makefile` to separate kernel linking from task linking.
+
+```makefile
+# Makefile
+
 .DEFAULT_GOAL := all
 
 NASM := nasm
@@ -52,6 +90,7 @@ run: os.img
 	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio
 
 clean:
-	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin
+	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin os.img
 
 -include $(deps)
+```

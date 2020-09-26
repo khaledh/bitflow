@@ -118,12 +118,12 @@ void task_a() {
   1d:   c3                      ret    
 ```
 
-The call generated at line 16 is now using an absolute address (opcode `FF`). The address was stored in the `eax` register at line 6, which shows it's zero because the `kput_str` symbol hasn't been resolved by the linker yet. Let's do a full build and inspect the `kernel.img` output to see if it worked.
+The call generated at line 16 is now using an absolute address (opcode `FF`). The address was stored in the `eax` register at line 6, which shows it's zero because the `kput_str` symbol hasn't been resolved by the linker yet. Let's do a full build and inspect the `kernel.bin` output to see if it worked.
 
 ```
 $ make
 ...
-$ ndisasm -u -o 0x7e00 -s 0x8200 kernel.img
+$ ndisasm -u -o 0x7e00 -s 0x8200 kernel.bin
 [snip]
 00008200  55                push ebp
 00008201  89E5              mov ebp,esp
@@ -144,7 +144,7 @@ $ ndisasm -u -o 0x7e00 -s 0x8200 kernel.img
 The `task_a.o` module was linked at address `0x8200` (hence the `-s 0x8200` to `ndisasm` to _sync_ interpretation at this point, as disassembly can sometimes go out of as it encounters data intermingled with code). Our call instruction is at `0x8216`, and the address in `eax` was loaded at `0x8206`. This time we can see that the absolute address is not being directly loaded from an immediate value, but from a memory location (since the function pointer is actually a pointer variable) stored at address `0x7fe4`. Let's get the 4-byte value at that location.
 
 ```
-❯ xxd -s 0x01e4 -l 4 -e kernel.img
+❯ xxd -s 0x01e4 -l 4 -e kernel.bin
 000001e4: 00007f44                             D...
 ```
 
@@ -159,7 +159,7 @@ LDFLAGS := --oformat=binary --entry=kmain --print-map
 Then let's run the link step:
 
 ```
-$ rm kernel.img && make kernel.img | grep put_str$
+$ rm kernel.bin && make kernel.bin | grep put_str$
                 0x0000000000007f44                put_str
                 0x0000000000007fe4                kput_str
 ```
@@ -201,4 +201,4 @@ So far we are linking user tasks with the kernel, which allowed us to pretend th
 - executing: the kernel transfers control to the task and regains it when the task ends
 - calling kernel functions: once the task is running, it may call upon the kernel to execute a certain service on its behalf
    
-We need to go one step further and remove user tasks from the kernel image, and store the task as a separate image on the hard disk image. This is going to require the kernel to actually load the task image from disk. And that's what we'll be doing next: writing a simple disk driver.
+We need to go one step further and remove user tasks from the kernel binary, and store the task as a separate binary on the disk image. This is going to require the kernel to actually load the task binary from disk. And that's what we'll be doing next: writing a simple disk driver.

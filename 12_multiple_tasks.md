@@ -49,7 +49,7 @@ task_a.o: task_a.c
 task_b.o: task_b.c
 	$(GCC) $(CFLAGS) -c $< -o $@
 
-kernel.img: $(OBJECTS) linker.ld
+kernel.bin: $(OBJECTS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJECTS) -T linker.ld -o $@
 ...
 ```

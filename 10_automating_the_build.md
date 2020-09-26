@@ -26,18 +26,18 @@ NASM := nasm
 GCC := i386-elf-gcc
 LD := i386-elf-ld
 
-os.img: bootsect.img kernel.img
-	cat bootsect.img kernel.img > os.img
+os.img: bootsect.bin kernel.bin
+	cat bootsect.bin kernel.bin > os.img
 
-bootsect.img: bootsect.asm
-	$(NASM) bootsect.asm -o bootsect.img
+bootsect.bin: bootsect.asm
+	$(NASM) bootsect.asm -o bootsect.bin
 
 kernel.o:
 	$(GCC) -fno-asynchronous-unwind-tables -c kernel.c -o kernel.o
 
-kernel.img: kernel.c
+kernel.bin: kernel.c
 	$(GCC) -fno-asynchronous-unwind-tables -c kernel.c -o kernel.o
-	$(LD) --oformat=binary --entry=kmain kernel.o -o kernel.img
+	$(LD) --oformat=binary --entry=kmain kernel.o -o kernel.bin
 ```
 
 Notice that we cannot use alises in Makefiles, as make doesn't know about shell aliases. We can simplify this a bit by leveraging the automatic variables feature of make.
@@ -47,16 +47,16 @@ NASM := nasm
 GCC := i386-elf-gcc
 LD := i386-elf-ld
 
-os.img: bootsect.img kernel.img
+os.img: bootsect.bin kernel.bin
 	cat $^ > os.img
 
-bootsect.img: bootsect.asm
+bootsect.bin: bootsect.asm
 	$(NASM) $< -o $@
 
 kernel.o: kernel.c
 	$(GCC) -fno-asynchronous-unwind-tables -c $< -o $@
 
-kernel.img: kernel.o
+kernel.bin: kernel.o
 	$(LD) --oformat=binary --entry=kmain $^ -o $@
 ```
 
@@ -75,16 +75,16 @@ GCC := i386-elf-gcc
 LD := i386-elf-ld
 QEMU := qemu-system-i386
 
-os.img: bootsect.img kernel.img
+os.img: bootsect.bin kernel.bin
 	cat $^ > os.img
 
-bootsect.img: bootsect.asm
+bootsect.bin: bootsect.asm
 	$(NASM) $< -o $@
 
 kernel.o: kernel.c
 	$(GCC) -fno-asynchronous-unwind-tables -c $< -o $@
 
-kernel.img: kernel.o
+kernel.bin: kernel.o
 	$(LD) --oformat=binary --entry=kmain $^ -o $@
 
 run: os.img
@@ -96,8 +96,8 @@ Now we can just type `make run` to build everything and launch the built disk im
 ```
 $ make run
 i386-elf-gcc -fno-asynchronous-unwind-tables -c kernel.c -o kernel.o
-i386-elf-ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-cat bootsect.img kernel.img > os.img
+i386-elf-ld --oformat=binary --entry=kmain kernel.o -o kernel.bin
+cat bootsect.bin kernel.bin > os.img
 qemu-system-i386 -nic none -drive file=os.img,format=raw
 ```
 ```

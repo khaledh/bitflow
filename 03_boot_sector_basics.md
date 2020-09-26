@@ -19,31 +19,31 @@ $ qemu-img create myimage.img mysize
 OK, let's create a disk image that is one sector in size, i.e. 512 bytes:
 
 ```
-$ qemu-img create bootsect.img 512
+$ qemu-img create bootsect.bin 512
 ```
 
 Cool, that created a file that is exactly 512 bytes in size. Let's take a quick look at its contents using the hex dump tool `xxd` (the `-a` option auto-skips nul lines, replacing them with a single `*`):
 
 ```
-$ xxd -a bootsect.img
+$ xxd -a bootsect.bin
 00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 *
 000001f0: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 ```
 
-The boot sector image is all zeros. Let's try to boot this image:
+The boot sector is all zeros. Let's try to boot this image:
 
 ```
-$ qemu bootsect.img
-WARNING: Image format was not specified for 'bootsect.img' and probing guessed raw.
+$ qemu bootsect.bin
+WARNING: Image format was not specified for 'bootsect.bin' and probing guessed raw.
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.
 ```
 
-Let's get rid of this warning by explicitly specifying the disk image format:
+Let's get rid of this warning by explicitly specifying the disk image format as `raw`:
 
 ```
-$ qemu -device file=bootsect.img,format=raw
+$ qemu -device file=bootsect.bin,format=raw
 ```
 ```
 Booting from Hard Disk...
@@ -57,13 +57,13 @@ The BIOS doesn't recognize the disk image as bootable. Let's take a look at the 
 So that's what we're missing. We need to add those two bytes at the end of the boot sector. Let's use `xxd` again, but this time in _reverse_ mode, i.e. we'll give it the offset and bytes in hex and it will write out them in binary.
 
 ```
-$ echo "1FE: 55 AA" | xxd -r - bootsect.img
+$ echo "1FE: 55 AA" | xxd -r - bootsect.bin
 ```
 
-This command tells `xxd` to write the two bytes `55 AA` at address `1FE` in the `bootsect.img` file. Let's check the file again:
+This command tells `xxd` to write the two bytes `55 AA` at address `1FE` in the `bootsect.bin` file. Let's check the file again:
 
 ```
-$ xxd -a bootsect.img
+$ xxd -a bootsect.bin
 00000000: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 *
 000001f0: 0000 0000 0000 0000 0000 0000 0000 55aa  ..............U.
@@ -72,7 +72,7 @@ $ xxd -a bootsect.img
 Great! Let's try to boot this image:
 
 ```
-$ qemu bootsect.img
+$ qemu bootsect.bin
 ```
 ```
 Booting from Hard Disk...
@@ -97,8 +97,8 @@ We need to add valid instructions at the beginning of the boot sector. Normally 
 A simple instruction that will serve here is just `hlt`, which halts the CPU. The opcode for `hlt` is `F4`. So let's use `xxd` to set the first byte in the boot sector to this opcode:
 
 ```
-$ echo "0: F4" | xxd -r - bootsect.img
-$ xxd -a bootsect.img
+$ echo "0: F4" | xxd -r - bootsect.bin
+$ xxd -a bootsect.bin
 00000000: f400 0000 0000 0000 0000 0000 0000 0000  ................
 00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 *
@@ -117,8 +117,8 @@ We still ended up at the same random address. What's going on here may not be ob
 [^2]: We can only disable maskable interrupts. Non-Maskable Interrupts (NMI) can always interrupt the CPU. But we won't worry about this now.
 
 ```
-$ echo "0: FAF4" | xxd -r - bootsect.img
-$ xxd -a bootsect.img
+$ echo "0: FAF4" | xxd -r - bootsect.bin
+$ xxd -a bootsect.bin
 00000000: faf4 0000 0000 0000 0000 0000 0000 0000  ................
 00000010: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 *

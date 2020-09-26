@@ -181,7 +181,7 @@ OBJECTS := kernel.o cpu.o console.o task.o task_a.o task_b.o
 %.o: %.c
 	$(GCC) $(CFLAGS) -c $< -o $@
 
-kernel.img: $(OBJECTS) linker.ld
+kernel.bin: $(OBJECTS) linker.ld
 	$(LD) $(LDFLAGS) $(OBJECTS) -T linker.ld -o $@
 ...
 ```

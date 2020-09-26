@@ -189,8 +189,8 @@ LIGHTGRAY_ON_BLACK   equ 0x07
 Let's put everything together and test our protected mode kernel.
 
 ```
-$ nasm -o bootsect.img bootsect.asm
-$ cat bootsect.img kernel.img > os.img
+$ nasm -o bootsect.bin bootsect.asm
+$ cat bootsect.bin kernel.bin > os.img
 $ qemu -drive file=os.img,format=raw
 ```
 ```

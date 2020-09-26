@@ -1,6 +1,6 @@
 # Writing the Kernel in C
 
-So far we've been using assembly, making us able to move seemlessly from the boot loader to the kernel by jumping directly to the kernel entry point absolute address. To start writing the kernel in C, we'll need to find out how to produce the kernel image in a way that still makes it easy to jump to the kernel entry point.
+So far we've been using assembly, making us able to move seemlessly from the boot loader to the kernel by jumping directly to the kernel entry point absolute address. To start writing the kernel in C, we'll need to find out how to produce the kernel binary in a way that still makes it easy to jump to the kernel entry point.
 
 ### Prerequisites
 
@@ -87,22 +87,22 @@ There are a few ways to achieve this.
 We can ask the linker to take our object file and produce a flat binary instead of the default (ELF):
 
 ```
-$ ld --oformat=binary kernel.o -o kernel.img
+$ ld --oformat=binary kernel.o -o kernel.bin
 i386-elf-ld: warning: cannot find entry symbol _start; defaulting to 0000000008048000
 ```
 
 While this worked, the linker produced a warning that it cannot find the default entry point symbol called `_start`. This symbol is usually provided by the C runtime startup routine, which eventually call's the typical C `main` function. We can ignore this warning since we're not relying on an ELF loader; we'll jump to our kernel's entry point directly from the boot loader. However, it's better to get rid of the wraning, so let's tell the linker to use our kernel `kmain` function symbol as the entry point (not that this changes anything, but just to keep the linker happy):
 
 ```
-$ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-$ file kernel.img
+$ ld --oformat=binary --entry=kmain kernel.o -o kernel.bin
+$ file kernel.bin
 kernel: data
 ```
 
 This time we don't get any warning. When we inspect the file type we're told it's just "data", i.e. raw binary. Ideally our kernel should contain only the machine instructions corresponding to the `kmain` function. Let's disassemble it and see (the `-u` option is a more compact version of `-b 32`):
 
 ```
-$ ndisasm -u kernel.img
+$ ndisasm -u kernel.bin
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -129,8 +129,8 @@ Idx Name          Size      VMA       LMA       File off  Algn  Flags
   2 .bss          00000000  00000000  00000000  00000039  2**0  ALLOC
   3 .comment      00000012  00000000  00000000  00000039  2**0  CONTENTS, READONLY
 
-$ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-$ ndisasm -u kernel.img
+$ ld --oformat=binary --entry=kmain kernel.o -o kernel.bin
+$ ndisasm -u kernel.bin
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -152,8 +152,8 @@ collect2: error: ld returned 1 exit status
 It looks like the compiler is telling the linker to link the C runtime library, which it can't find because we don't have a cross-compiled C runtime available. That's intentional, since we're writing a new kernel that doesn't have a C runtime yet. So we need to tell the compiler to not include the C runtime using the `-nostdlib` option:
 
 ```
-$ gcc -nostdlib -fno-asynchronous-unwind-tables -Wl,--oformat=binary -Wl,--entry=kmain kernel.c -o kernel.img
-$ ndisasm -u kernel.img
+$ gcc -nostdlib -fno-asynchronous-unwind-tables -Wl,--oformat=binary -Wl,--entry=kmain kernel.c -o kernel.bin
+$ ndisasm -u kernel.bin
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -165,8 +165,8 @@ We can also use the `objcopy` to extract the `.text` section of the object file.
 
 ```
 $ gcc -c kernel.c -o kernel.o
-$ objcopy j .text -O binary kernel.o kernel.img
-$ ndisasm -u kernel.img
+$ objcopy j .text -O binary kernel.o kernel.bin
+$ ndisasm -u kernel.bin
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  EBFE              jmp short 0x3
@@ -179,7 +179,7 @@ Notice that in this case we didn't have to use any special compiler options, and
 Let's put together our boot sector and our new 32-bit kernel.
 
 ```
-$ cat bootsect.img kernel.img > os.img
+$ cat bootsect.bin kernel.bin > os.img
 $ qemu -drive file=os.img,format=raw
 ```
 ```
@@ -215,8 +215,8 @@ Let's compile and see what the binary looks like[^1].
 
 ```
 $ gcc -fno-asynchronous-unwind-tables -c kernel.c -o kernel.o
-$ ld --oformat=binary --entry=kmain kernel.o -o kernel.img
-$ ndisasm -u kernel.img
+$ ld --oformat=binary --entry=kmain kernel.o -o kernel.bin
+$ ndisasm -u kernel.bin
 00000000  55                push ebp
 00000001  89E5              mov ebp,esp
 00000003  B800800B00        mov eax,0xb8000
@@ -227,7 +227,7 @@ $ ndisasm -u kernel.img
 Looks good. Let's test it.
 
 ```
-$ cat bootsect.img kernel.img > os.img
+$ cat bootsect.bin kernel.bin > os.img
 $ qemu -drive file=os.img,format=raw
 ```
 ```
