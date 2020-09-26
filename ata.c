@@ -1,34 +1,35 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "console.h"
+#include "port.h"
 
-#define ATA0_DATA         0x1F0
-#define ATA0_RD_ERROR     0x1F1
-#define ATA0_WR_FEATURES  0x1F1
-#define ATA0_SECTOR_COUNT 0x1F2
-#define ATA0_LBA_00       0x1F3
-#define ATA0_LBA_08       0x1F4
-#define ATA0_LBA_16       0x1F5
-#define ATA0_LBA_24_HEAD  0x1F6
-#define ATA0_RD_STATUS    0x1F7
-#define ATA0_WR_COMMAND   0x1F7
+#define ATA0_BASE         0x1F0
 
-#define DRV_HEAD_REG_MASK 0b10100000
-#define DRV_HEAD_REG_LBA  0b01000000
-#define DRV_HEAD_REG_DRV1 0b00010000
+#define REG_DATA          0
+#define REG_ERROR         1
+#define REG_FEATURES      1
+#define REG_SECTOR_COUNT  2
+#define REG_LBA_00        3
+#define REG_LBA_08        4
+#define REG_LBA_16        5
+#define REG_LBA_24        6
+#define REG_STATUS        7
+#define REG_COMMAND       7
 
-#define CMD_RD_SECTORS    0x20
+#define FLAG_LBA          0b01000000
+#define FLAG_DRV1         0b00010000
+
+#define CMD_READ_SECTORS  0x20
 #define STATUS_BUSY       0x80
 #define STATUS_DRQ        0x08
 #define STATUS_ERR        0x01
 
-#define ERR_NOTHING       0x01
-#define ERR_FORMATTER_DEV 0x02
-#define ERR_SECTOR_BUF    0x03
-#define ERR_ECC_CIRCUITRY 0x04
-#define ERR_CONTROL       0x05
-#define ERR_DRV1_FAILED   0x80
-
+// #define ERR_NOTHING       0x01
+// #define ERR_FORMATTER_DEV 0x02
+// #define ERR_SECTOR_BUF    0x03
+// #define ERR_ECC_CIRCUITRY 0x04
+// #define ERR_CONTROL       0x05
+// #define ERR_DRV1_FAILED   0x80
 
 void to_hexb(uint8_t value, char* buf) {
     char digits[17] = "01234567890abcdef";
@@ -44,78 +45,67 @@ void to_hexw(uint16_t value, char* buf) {
     }
 }
 
-void port_outb(uint16_t port, uint8_t byte) {
-    asm("out dx, al"
-        : // no output data
-        : "Nd"(port), "a"(byte));
-}
+// void handle_error() {
+//     print("ATA Error: ");
 
-uint8_t port_inb(uint16_t port) {
-    uint8_t byte;
-    asm("in ax, dx"
-        : "=a"(byte)
-        : "Nd"(port));
-    return byte;
-}
+//     uint8_t error = port_in8(ATA0_BASE + REG_ERROR);
+//     char hex[3] = "__";
+//     to_hexb(error, hex);
+//     print(hex);
 
-uint16_t port_inw(uint16_t port) {
-    uint16_t word;
-    asm("inw ax, dx"
-        : "=a"(word)
-        : "Nd"(port));
-    return word;
-}
+//     switch (error) {
+//         case 0:                 print("0"); break;      
+//         case ERR_NOTHING:       print("ERR_NOTHING"); break;      
+//         case ERR_FORMATTER_DEV: print("ERR_FORMATTER_DEV"); break;
+//         case ERR_SECTOR_BUF:    print("ERR_SECTOR_BUF"); break;   
+//         case ERR_ECC_CIRCUITRY: print("ERR_ECC_CIRCUITRY"); break;    
+//         case ERR_CONTROL:       print("ERR_CONTROL"); break;      
+//         case ERR_DRV1_FAILED:   print("ERR_DRV1_FAILED"); break;  
+//     }
+// }
 
 void wait_on_busy() {
-    uint8_t busy = port_inb(ATA0_RD_STATUS) & STATUS_BUSY;
+    uint8_t busy = port_in8(ATA0_BASE + REG_STATUS) & STATUS_BUSY;
     while (busy) {
         asm("pause"::);
-        busy = port_inb(ATA0_RD_STATUS) & STATUS_BUSY;
+        busy = port_in8(ATA0_BASE + REG_STATUS) & STATUS_BUSY;
     };
 }
 
-void handle_error() {
-    print("ATA Error: ");
-
-    uint8_t error = port_inb(ATA0_RD_ERROR);
-    char hex[3] = "__";
-    to_hexb(error, hex);
-    print(hex);
-
-    switch (error) {
-        case 0:                 print("0"); break;      
-        case ERR_NOTHING:       print("ERR_NOTHING"); break;      
-        case ERR_FORMATTER_DEV: print("ERR_FORMATTER_DEV"); break;
-        case ERR_SECTOR_BUF:    print("ERR_SECTOR_BUF"); break;   
-        case ERR_ECC_CIRCUITRY: print("ERR_ECC_CIRCUITRY"); break;    
-        case ERR_CONTROL:       print("ERR_CONTROL"); break;      
-        case ERR_DRV1_FAILED:   print("ERR_DRV1_FAILED"); break;  
-    }
-}
-
-void read_sectors(uint32_t start, size_t count, uint16_t* dest) {
+int read_sectors(uint32_t start, size_t count, uint32_t* dest) {
     wait_on_busy();
 
-    port_outb(ATA0_LBA_00, (uint8_t)start);
-    port_outb(ATA0_LBA_08, (uint8_t)(start >> 8));
-    port_outb(ATA0_LBA_16, (uint8_t)(start >> 16));
-    port_outb(ATA0_LBA_24_HEAD, (uint8_t)(start >> 24 | DRV_HEAD_REG_MASK | DRV_HEAD_REG_LBA));
-    port_outb(ATA0_SECTOR_COUNT, count);
-    port_outb(ATA0_WR_COMMAND, CMD_RD_SECTORS);
+    // send LBA block address
+    port_out8(ATA0_BASE + REG_LBA_00, (uint8_t)start);
+    port_out8(ATA0_BASE + REG_LBA_08, (uint8_t)(start >> 8));
+    port_out8(ATA0_BASE + REG_LBA_16, (uint8_t)(start >> 16));
+    port_out8(ATA0_BASE + REG_LBA_24, (uint8_t)(start >> 24 | FLAG_LBA));
+    // send sector count
+    port_out8(ATA0_BASE + REG_SECTOR_COUNT, count);
+    // send command
+    port_out8(ATA0_BASE + REG_COMMAND, CMD_READ_SECTORS);
 
-    uint8_t status;
+    // read sectors
+    size_t read_count = 0;
+    uint16_t* ptr = (uint16_t*)dest;
     for (int c = 0; c < count; c++) {
         wait_on_busy();
-        status = port_inb(ATA0_RD_STATUS);
 
+        uint8_t status = port_in8(ATA0_BASE + REG_STATUS);
         if (status & STATUS_ERR) {
-            handle_error();
+            // ideally we should read the Error register for more details
+            break;
         }
-
-        if (status & STATUS_DRQ) {
-            for (int i = 0; i < 256; i++, dest++) {
-                *dest = port_inw(ATA0_DATA);
-            }
+        if ((status & STATUS_DRQ) == 0) {
+            // this shouldn't happen; we may handle this differently later
+            break;
         }
+        // read sector's data in 16-bit words
+        for (int i = 0; i < 256; i++, ptr++) {
+            *ptr = port_in16(ATA0_BASE + REG_DATA);
+        }
+        read_count++;
     }
+
+    return read_count;
 }

@@ -6,7 +6,7 @@ QEMU := qemu-system-i386
 CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel
 LDFLAGS := --oformat=binary --entry=kmain
 
-SRCS = kernel.c console.c cpu.c task.c ata.c task_a.c task_b.c
+SRCS = kernel.c console.c cpu.c task.c port.c ata.c task_a.c task_b.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 

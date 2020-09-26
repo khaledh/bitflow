@@ -13,20 +13,16 @@ void kmain() {
 
     print("Booting kernel...");
 
-    // load and execute two tasks in sequence
-    // exec(0);
-    // exec(1);
-
-    uint16_t* load_addr = (uint16_t*)0xf000;
+    uint32_t* load_addr = (uint32_t*)0xf000;
 
     {
-        read_sectors(5 /* start */, 1 /* count */, load_addr);
+        read_sectors(4 /* start */, 1 /* count */, load_addr);
         task_t task = (task_t)load_addr;
         task();
     }
 
     {
-        read_sectors(6 /* start */, 1 /* count */, load_addr);
+        read_sectors(5 /* start */, 1 /* count */, load_addr);
         task_t task = (task_t)load_addr;
         task();
     }
