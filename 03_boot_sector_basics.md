@@ -1,3 +1,5 @@
+# Boot Sector Basics
+
 Now that we understand a bit more about our boot environment, we should take over control from the BIOS once it loads our boot sector at 0x07C00.
 
 Assuming we have a boot sector, how do we tell QEMU to use it as a bootable disk?

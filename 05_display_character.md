@@ -1,4 +1,4 @@
-# Display a single character on screen
+# Display a Single Character
 
 Checking the CPU state using QEMU's monitor is useful, but it's going to be tedious if we have to do it every time we need to check a particular state. It would be much better if we can output what we want on the screen to let the code tell us what it is doing.
 

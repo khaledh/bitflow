@@ -1,4 +1,4 @@
-# Boot sector in assembly
+# Boot Sector in Assembly
 
 We won't be able to go far by manually writing machine code in hex. To make our lives easier we're going to need an assembler. There are many x86 assemblers available, but NASM[^1] seems to be a popular choice, so we'll use that.
 

@@ -1,3 +1,5 @@
+# x86 Boot Environment
+
 When a PC is turned on, the BIOS performs a Power-On Self-Test (POST), and then starts the CPU.
 
 The CPU starts executing at address 0xFFFFFFF0. The BIOS ROM entry point is mapped at this memory address, so control is transferred to the BIOS.
@@ -9,9 +11,11 @@ Assuming the first bootable device is a hard drive, the BIOS loads the first sec
 At this point the execution environment is called Real-Address Mode, or Real Mode for short. This is a 16-bit mode. Since a 16-bit address can access only 64K of memory, a scheme called segmentation is used to allow addressing up to 1MB, which is the maximum allowed by the 20-bit address bus of the original 8086. A segmented memory address consists of two parts: a 16-bit segment and a 16-bit offset within that segment. To form a physical address, the segment is multiplied by 16 (i.e. left-shifted by 4-bits) and the offset is added to it.
 
 Example:
+```
        segment:  0x1000
         offset:  0xFD33
   real address: 0x1FD33
+```
 
 So we have a memory address space ranging from 0x00000 to 0xFFFFF (1MB).
 
