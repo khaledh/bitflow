@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdint.h>
-#include "console.h"
 #include "port.h"
 
 #define ATA0_BASE         0x1F0
@@ -30,20 +29,6 @@
 // #define ERR_ECC_CIRCUITRY 0x04
 // #define ERR_CONTROL       0x05
 // #define ERR_DRV1_FAILED   0x80
-
-void to_hexb(uint8_t value, char* buf) {
-    char digits[17] = "01234567890abcdef";
-    for (int i = 0; i < 2; i++) {
-        buf[1 - i] = digits[(value >> (i * 4)) & 0x000F];
-    }
-}
-
-void to_hexw(uint16_t value, char* buf) {
-    char digits[17] = "01234567890abcdef";
-    for (int i = 0; i < 4; i++) {
-        buf[3 - i] = digits[(value >> (i * 4)) & 0x000F];
-    }
-}
 
 // void handle_error() {
 //     print("ATA Error: ");

@@ -1,3 +1,3 @@
 #pragma once
 
-void exec(int task_index);
+void exec(const char* name);

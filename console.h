@@ -24,14 +24,13 @@
 #define DEFAULT_COLOR    GRAY_LT_ON_BLACK
 
 void clear_screen();
-void put_char(char ch, char attr, int row, int col);
-void put_str(char* str, char attr, int row, int col);
-void write_char(char ch, char attr);
-void write_str(char* str, char attr);
-void print(char* str);
 
-extern void (*kclear_screen)();
-extern void (*kput_char)(char ch, char attr, int row, int col);
-extern void (*kput_str)(char* str, char attr, int row, int col);
-extern void (*kwrite_char)(char ch, char attr);
-extern void (*kwrite_str)(char* str, char attr);
+void put_char(char ch, char attr, int row, int col);
+void put_str(const char* str, char attr, int row, int col);
+
+void write_char(char ch, char attr);
+void write_str(const char* str, char attr);
+
+void print(const char* str);
+
+void print_hex32(uint32_t value);
