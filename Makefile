@@ -5,11 +5,11 @@ GCC := i386-elf-gcc
 LD := i386-elf-ld
 QEMU := qemu-system-i386
 
-CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel
+CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP
 LDFLAGS := --oformat=binary
 
 %.o: %.c
-	$(GCC) $(CFLAGS) -MMD -MP -c $< -o $@
+	$(GCC) $(CFLAGS) -c $< -o $@
 
 ##
 # boot sector
@@ -32,13 +32,16 @@ kernel.bin: $(KERNEL_OBJS) kernel.ld
 ##
 # tasks
 #
-task_%.bin: task_%.o task.ld
-	$(LD) $(LDFLAGS) $(filter-out task.ld,$^) -T task.ld -o $@
+task_a.bin: task_a.o task.ld
+	$(LD) $(LDFLAGS) $< -T task.ld -o $@
+
+task_b.bin: task_b.o task.ld
+	$(LD) $(LDFLAGS) $< -T task.ld -o $@
 
 ##
 # OS image
-#
-os.img: bootsect.bin kernel.bin task_*.bin
+
+os.img: bootsect.bin kernel.bin task_a.bin task_b.bin
 	cat $^ > os.img
 
 ##
@@ -52,6 +55,6 @@ run: os.img
 	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio
 
 clean:
-	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin
+	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin os.img
 
 -include $(deps)
