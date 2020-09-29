@@ -22,7 +22,7 @@ bootsect.bin: bootsect.asm
 #
 KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain
 
-KERNEL_SRCS = kernel.c console.c cpu.c task.c port.c ata.c util.c
+KERNEL_SRCS = kernel.c console.c cpu.c task.c port.c ata.c util.c kvector.c
 KERNEL_OBJS = $(KERNEL_SRCS:.c=.o)
 KERNEL_DEPS = $(KERNEL_SRCS:.c=.d)
 

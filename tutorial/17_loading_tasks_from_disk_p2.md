@@ -281,4 +281,4 @@ It worked! It's definitely not a maintainable setup, but at least proved to ours
 
 ### Next
 
-Although we will need to improve how a task finds and calls a kernel function, I'm going to park this for now and come back to it later. We'll switch our attention to giving tasks unique names, and loading them by name instead of by sector number.
+Having hard coded function addresses won't get us far, since any change the kernel may cause the function address to change. We will need to improve how a task finds and calls a kernel function.

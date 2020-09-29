@@ -1,8 +1,10 @@
 #include <stdint.h>
 #include "console.h"
+#include "kvector.h"
 
-void (*kput_str)(const char* str, char attr, int row, int col) = (void *)0x7f91;
+typedef void (*put_str_t)(const char*, char, int, int);
 
-void task_b() {
+void entry(kernel_vector_t kvectors[]) {
+    put_str_t kput_str = (put_str_t)kvectors[KVECT_PUT_STR];
     kput_str("Task B", BROWN_ON_GRAY_LT, 2, 0);
 }

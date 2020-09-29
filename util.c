@@ -19,3 +19,8 @@ void to_hex32(uint32_t value, char* buf) {
         buf[7 - i] = hex_digits[(value >> (i * 4)) & 0xF];
     }
 }
+
+int strcmp(const char* str1, const char* str2) {
+    for(; *str1 && *str2 && *str1 == *str2; str1++, str2++);
+    return *str1 - *str2;
+}

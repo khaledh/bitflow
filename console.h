@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 // text mode colors
 #define BLACK       0x0
 #define BLUE        0x1
