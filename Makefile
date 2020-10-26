@@ -5,7 +5,7 @@ GCC := i386-elf-gcc
 LD := i386-elf-ld
 QEMU := qemu-system-i386
 
-CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP
+CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP -mgeneral-regs-only
 LDFLAGS := --oformat=binary
 
 %.o: %.c
@@ -20,9 +20,12 @@ bootsect.bin: bootsect.asm
 ##
 # kernel
 #
-KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain
+KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain # --print-map
 
-KERNEL_SRCS = kernel.c console.c cpu.c task.c port.c ata.c util.c kvector.c
+KERNEL_SRCS = \
+	kernel.c console.c cpu.c task.c \
+	port.c ata.c util.c kvector.c \
+	idt.c irq.c keyboard.c kbd.c
 KERNEL_OBJS = $(KERNEL_SRCS:.c=.o)
 KERNEL_DEPS = $(KERNEL_SRCS:.c=.d)
 
@@ -52,7 +55,7 @@ os.img: bootsect.bin kernel.bin task_a.bin task_b.bin
 all: os.img
 
 run: os.img
-	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio
+	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio -no-shutdown -no-reboot # -d int
 
 clean:
 	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin os.img

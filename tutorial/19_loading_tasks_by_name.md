@@ -148,8 +148,8 @@ Great, it works!
 
 ### Recap
 
-We created a simple way to load and execute tasks by name. We still have the mapping between task names and sector numbers hard coded though.
+We created a simple way to load and execute tasks by name. We still have the mapping between task names and sector numbers hard coded though. We'll deal with this issue later when it's time to add a file system.
 
 ### Next
 
-???
+It would be great if we can load and execute a task by typing its name. This is going to require interfacing with the keyboard and handling interrupts, and that's what we're going to do next.

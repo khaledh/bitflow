@@ -17,8 +17,8 @@ typedef struct {
 } task_map_t;
 
 task_map_t tasks[] = {
-    { "task_a", 5 },
-    { "task_b", 6 },
+    { "taska", 13 },
+    { "taskb", 14 },
     { NULL,     0 }
 };
 
@@ -42,11 +42,14 @@ int load_task(const char* name, uint32_t* dest) {
     return (read_count == 1) ? 0 : -1;
 }
 
-void exec(const char* name) {
+int exec(const char* name) {
     // load
-    if (load_task(name, (uint32_t*)TASK_LOAD_ADDR) == 0) {
+    int load_result = load_task(name, (uint32_t*)TASK_LOAD_ADDR);
+    if (load_result == 0) {
         // execute
         task_t task = (task_t)TASK_LOAD_ADDR;
         task(kernel_vectors);
     }
+
+    return load_result;
 }

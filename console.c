@@ -14,14 +14,24 @@ uint16_t* const video_memory = (uint16_t* const)VIDEO_MEMORY_ADDR;
 uint16_t current_offset = 0;
 
 int put_char_at(char ch, char attr, int offset) {
+    int advance = 1;
     if (ch == '\n') {
         return offset + (SCREEN_COLS - COL(offset));
     }
     if (ch == '\r') {
         return offset - COL(offset);
     }
-    *(video_memory + offset++) = (attr << 8) | ch;
-    return offset;
+    if (ch == '\b') {
+        if (COL(offset) == 0) {
+            return offset;
+        }
+        ch = 0;
+        attr = DEFAULT_COLOR;
+        offset = offset - 1;
+        advance = 0;
+    }
+    *(video_memory + offset) = (attr << 8) | ch;
+    return advance ? offset + 1 : offset;
 }
 
 int put_str_at(const char* str, char attr, int offset) {
@@ -68,8 +78,24 @@ void write_str(const char* str, char attr) {
     current_offset = put_str_at(str, attr, current_offset);
 }
 
+void print_char(char ch) {
+    write_char(ch, DEFAULT_COLOR);
+}
+
 void print(const char* str) {
     write_str(str, DEFAULT_COLOR);
+}
+
+void print_hex8(uint8_t value) {
+    char hex[] = "__";
+    to_hex8(value, hex);
+    print(hex);
+}
+
+void print_hex16(uint16_t value) {
+    char hex[] = "____";
+    to_hex16(value, hex);
+    print(hex);
 }
 
 void print_hex32(uint32_t value) {

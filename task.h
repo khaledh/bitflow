@@ -1,3 +1,3 @@
 #pragma once
 
-void exec(const char* name);
+int exec(const char* name);
