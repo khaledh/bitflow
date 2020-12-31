@@ -17,7 +17,7 @@
 #define PIC_EOI		 0x20  // End-of-interrupt command
 
 /**
- * Remap PIC1 and PIC2 interrupt vectors to start at 32 and 40, rspectively.
+ * Remap PIC1 and PIC2 interrupt vectors to start at 32 and 40, respectively.
  */
 static void remap_pic() {
 	// ICW1 - begin initialization
@@ -70,8 +70,7 @@ void irq_enable(uint8_t irq_no) {
 	}
 
 	uint8_t mask = port_in8(port) & ~(1 << irq_no);
-	// port_out8(port, mask);
-	port_out8(port, 0b11111101);
+	port_out8(port, mask);
 }
 
 /**

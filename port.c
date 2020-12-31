@@ -14,7 +14,7 @@ void port_out16(uint16_t port, uint16_t word) {
 
 uint8_t port_in8(uint16_t port) {
     uint8_t byte;
-    asm("in ax, dx"
+    asm("in al, dx"
         : "=a"(byte)
         : "Nd"(port));
     return byte;

@@ -18,23 +18,23 @@ void kmain() {
 
     print("Booting kernel...\n");
 
-    shell();
-
-    print("\nBye");
+//    shell();
+//
+//    print("\nBye");
 
     // exec("task_a");
     // exec("task_b");
 
-    // idt_init();
-    // irq_init();
-    // keyboard_init();
-    // asm("sti");
+     idt_init();
+     irq_init();
+     keyboard_init();
+     asm("sti");
     
-    // while(1) {
-    //     asm("hlt");
-    // }
+     while(1) {
+         asm("hlt");
+     }
 
-    halt();
+//    halt();
 }
 
 void shell() {
