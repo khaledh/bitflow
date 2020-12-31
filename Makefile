@@ -1,8 +1,8 @@
 .DEFAULT_GOAL := all
 
 NASM := nasm
-GCC := i386-elf-gcc
-LD := i386-elf-ld
+GCC := i686-elf-gcc
+LD := i686-elf-ld
 QEMU := qemu-system-i386
 
 CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP -mgeneral-regs-only
