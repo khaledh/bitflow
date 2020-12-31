@@ -254,6 +254,16 @@ Task not found.
 Bye
 ```
 
+Great!
+
+### Recap
+
+* We were able to read scan codes from the keyboard and convert them to ASCII characters.
+* We implemented a very simple shell that reads the name of a task from the keyboard and executes the task if found.
+
+### Next Steps
+
+Polling the keyboard controller for available data is definitely not efficient. A better approach is to use interrupts, i.e. let the keyboard controller tell us when data is available to be read. We're going to setup interrupts and install a keyboard interrupt handler to allow us to do that.
 
 
 [^1]: These scancodes are from Scan Code Set 1, the original IBM XT scan code set. Scan Code Set 2 was introduced with the IBM AT and is the one used by modern keyboards. However, the keyboard controller translates scan codes to Scan Code Set 1 by default for backward compatibility, unless configured to disable this translation.
