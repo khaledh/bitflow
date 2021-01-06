@@ -20,13 +20,17 @@ bootsect.bin: bootsect.asm
 ##
 # kernel
 #
+task_switch.o: task_switch.asm
+	$(NASM) -felf32 $< -o $@
+
 KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain # --print-map
 
 KERNEL_SRCS = \
 	kernel.c console.c cpu.c task.c \
 	port.c ata.c util.c kvector.c \
-	idt.c irq.c keyboard.c kbd.c
-KERNEL_OBJS = $(KERNEL_SRCS:.c=.o)
+	idt.c irq.c keyboard.c kbd.c \
+	timer.c loader.c shell.c
+KERNEL_OBJS = $(KERNEL_SRCS:.c=.o) task_switch.o
 KERNEL_DEPS = $(KERNEL_SRCS:.c=.d)
 
 kernel.bin: $(KERNEL_OBJS) kernel.ld
