@@ -1,13 +1,11 @@
-#include "kernel.h"
-#include "console.h"
-#include "loader.h"
-#include "cpu.h"
-#include "idt.h"
-#include "irq.h"
-#include "keyboard.h"
-#include "timer.h"
+#include "../arch_x86/cpu.h"
+#include "../arch_x86/idt.h"
+#include "../device/console.h"
+#include "../device/keyboard.h"
+#include "../device/pic.h"
+#include "../device/pit.h"
+#include "../shell/shell.h"
 #include "task.h"
-#include "shell.h"
 
 
 void kmain() {

@@ -1,5 +1,4 @@
 #include "idt.h"
-#include "interrupt.h"
 
 #define TASK_GATE         0b00101
 #define INTERRUPT_GATE_32 0b01110

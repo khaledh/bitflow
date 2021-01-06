@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "kbd.h"
-#include "port.h"
+#include "../arch_x86/port.h"
 #include "console.h"
+#include "kbd.h"
 
 #define KEYBOARD_DATA   0x60
 #define KEYBOARD_STATUS 0x64

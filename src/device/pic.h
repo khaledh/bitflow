@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "interrupt.h"
+#include "../kernel/interrupt.h"
 
 void irq_init();
 void irq_install(uint8_t irq_no, interrupt_handler_t irq_handler);

@@ -55,7 +55,7 @@ pm_entry:
     hlt
 
 [bits 16]
-%include "gdt.asm" 
+%include "src/arch_x86/gdt.asm"
 
     times 510-($-$$) db 0
     db     0x55, 0xAA

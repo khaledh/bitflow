@@ -1,4 +1,4 @@
-#include "idt.h"
+#include "../arch_x86/idt.h"
 
 __attribute__ ((interrupt))
 void divide_error_handler(interrupt_frame_t* frame) {

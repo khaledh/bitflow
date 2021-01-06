@@ -1,7 +1,6 @@
 #include <stdint.h>
+#include "../kernel/util.h"
 #include "console.h"
-#include "cpu.h"
-#include "util.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25

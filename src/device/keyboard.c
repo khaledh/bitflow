@@ -1,9 +1,9 @@
 #include <stdint.h>
-#include "keyboard.h"
-#include "interrupt.h"
-#include "irq.h"
-#include "port.h"
+#include "../arch_x86/port.h"
+#include "../kernel/interrupt.h"
 #include "console.h"
+#include "keyboard.h"
+#include "pic.h"
 
 #define MAX_ITEMS    65
 #define next(pos)    ((pos + 1) % MAX_ITEMS)

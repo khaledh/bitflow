@@ -14,41 +14,53 @@ LDFLAGS := --oformat=binary
 ##
 # boot sector
 #
-bootsect.bin: bootsect.asm
+src/arch_x86/bootsect.bin: src/arch_x86/bootsect.asm
 	$(NASM) $< -o $@
 
 ##
 # kernel
 #
-task_switch.o: task_switch.asm
+src/arch_x86/task_switch.o: src/arch_x86/task_switch.asm
 	$(NASM) -felf32 $< -o $@
 
 KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain # --print-map
 
 KERNEL_SRCS = \
-	kernel.c console.c cpu.c task.c \
-	port.c ata.c util.c kvector.c \
-	idt.c irq.c keyboard.c kbd.c \
-	timer.c loader.c shell.c
-KERNEL_OBJS = $(KERNEL_SRCS:.c=.o) task_switch.o
+	src/arch_x86/cpu.c \
+	src/arch_x86/idt.c \
+	src/arch_x86/port.c \
+	src/device/ata.c \
+	src/device/console.c \
+	src/device/kbd.c \
+	src/device/keyboard.c \
+	src/device/pic.c \
+	src/device/pit.c \
+	src/kernel/kvector.c \
+	src/kernel/loader.c \
+	src/kernel/scheduler.c \
+	src/kernel/task.c \
+	src/kernel/util.c \
+	src/kernel/kernel.c \
+	src/shell/shell.c
+KERNEL_OBJS = $(KERNEL_SRCS:.c=.o) src/arch_x86/task_switch.o
 KERNEL_DEPS = $(KERNEL_SRCS:.c=.d)
 
-kernel.bin: $(KERNEL_OBJS) kernel.ld
-	$(LD) $(KERNEL_LDFLAGS) $(KERNEL_OBJS) -T kernel.ld -o $@
+kernel.bin: $(KERNEL_OBJS) src/kernel/kernel.ld
+	$(LD) $(KERNEL_LDFLAGS) $(KERNEL_OBJS) -T src/kernel/kernel.ld -o $@
 
 ##
 # tasks
 #
-task_a.bin: task_a.o task.ld
-	$(LD) $(LDFLAGS) $< -T task.ld -o $@
+task_a.bin: src/tasks/task_a.o src/tasks/task.ld
+	$(LD) $(LDFLAGS) $< -T src/tasks/task.ld -o $@
 
-task_b.bin: task_b.o task.ld
-	$(LD) $(LDFLAGS) $< -T task.ld -o $@
+task_b.bin: src/tasks/task_b.o src/tasks/task.ld
+	$(LD) $(LDFLAGS) $< -T src/tasks/task.ld -o $@
 
 ##
 # OS image
 
-os.img: bootsect.bin kernel.bin task_a.bin task_b.bin
+os.img: src/arch_x86/bootsect.bin kernel.bin task_a.bin task_b.bin
 	cat $^ > os.img
 
 ##
@@ -62,6 +74,6 @@ run: os.img
 	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio -no-shutdown -no-reboot # -d int
 
 clean:
-	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) task_*.o task_*.d *.bin os.img
+	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) src/tasks/task_*.o src/tasks/task_*.d src/arch_x86/*.bin *.bin os.img
 
 -include $(deps)
