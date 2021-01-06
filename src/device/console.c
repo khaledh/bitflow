@@ -1,3 +1,7 @@
+/**
+ * VGA Console
+ */
+
 #include <stdint.h>
 #include "../kernel/util.h"
 #include "console.h"

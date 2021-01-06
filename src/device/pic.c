@@ -1,3 +1,7 @@
+/**
+ * Programmable Interrupt Controller (PIC)
+ */
+
 #include <stdint.h>
 #include "../arch_x86/idt.h"
 #include "../arch_x86/port.h"

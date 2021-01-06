@@ -1,3 +1,7 @@
+/**
+ * Sample Task (A)
+ */
+
 #include "../device/console.h"
 #include "../kernel/kvector.h"
 

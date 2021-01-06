@@ -1,3 +1,7 @@
+/**
+ * Interrupt Descriptor Table (IDT)
+ */
+
 #include "idt.h"
 
 #define TASK_GATE         0b00101

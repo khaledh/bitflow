@@ -1,3 +1,7 @@
+/**
+ * Command Line Shell
+ */
+
 #include "shell.h"
 #include "../device/console.h"
 #include "../device/kbd.h"

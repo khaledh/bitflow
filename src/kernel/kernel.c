@@ -1,3 +1,7 @@
+/**
+ * Kernel entry point and initialization
+ */
+
 #include "../arch_x86/cpu.h"
 #include "../arch_x86/idt.h"
 #include "../device/console.h"

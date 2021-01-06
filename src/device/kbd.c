@@ -1,3 +1,7 @@
+/**
+ * PS/2 Keyboard
+ */
+
 #include <stdint.h>
 #include "../arch_x86/port.h"
 #include "console.h"

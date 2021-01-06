@@ -1,3 +1,7 @@
+/**
+ * CPU Exceptions
+ */
+
 #include "../arch_x86/idt.h"
 
 __attribute__ ((interrupt))

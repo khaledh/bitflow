@@ -1,3 +1,7 @@
+/**
+ * CPU Interrupts
+ */
+
 #pragma once
 
 #include <stdint.h>

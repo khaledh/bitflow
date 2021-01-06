@@ -1,16 +1,12 @@
-;   bootsect.asm
+;;;
+ ; x86 Boot Sector
+ ;;
+
 
 [org 0x7C00]
 
     ;
-    ; output 'B' to screen
-    ;
-    mov    ah, 0x0E              ; tty mode
-    mov    al, 'B'
-    int    0x10
-
-    ;
-    ; load a one-sector dummy kernel
+    ; load kernel
     ;
     mov    ah, 2                 ; INT 13,2 Read Disk Sectors
     mov    al, 16                ; read n sectors
@@ -29,7 +25,8 @@
     mov    eax, cr0
     or     eax, 0x1              ; set 32-bit mode bit in cr0
     mov    cr0, eax
-    jmp    0x08:pm_entry    ; far jump to load code seg selector
+    jmp    0x08:pm_entry         ; far jump to load code seg selector
+
 
 [bits 32]
 pm_entry:
@@ -48,14 +45,12 @@ pm_entry:
     ;
     jmp    0x08:0x7E00
 
-    ;
-    ; halt (we should never get here)
-    ;
-    cli
-    hlt
 
 [bits 16]
 %include "src/arch_x86/gdt.asm"
 
+    ;
+    ; pad with zeros; set boot sector magic number
+    ;
     times 510-($-$$) db 0
     db     0x55, 0xAA

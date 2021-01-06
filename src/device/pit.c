@@ -1,3 +1,7 @@
+/**
+ * Programmable Interval Timer (PIT)
+ */
+
 #include "../arch_x86/port.h"
 #include "../kernel/interrupt.h"
 #include "../kernel/task.h"

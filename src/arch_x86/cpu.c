@@ -1,3 +1,7 @@
+/**
+ * CPU
+ */
+
 #include "cpu.h"
 
 void idle() {

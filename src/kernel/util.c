@@ -1,3 +1,7 @@
+/**
+ * Kernel Utilities
+ */
+
 #include <stdint.h>
 
 const char hex_digits[] = "0123456789abcdef";

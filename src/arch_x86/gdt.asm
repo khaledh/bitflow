@@ -1,3 +1,8 @@
+;;;
+ ; Global Descriptor Table (GDT)
+ ;;
+
+
 gdt_start:         ; 0x00
     ; null descriptor
     dd 0x00000000

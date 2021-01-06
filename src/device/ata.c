@@ -1,3 +1,7 @@
+/**
+ * ATA (AT Attachment) Storage Device Interface
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 #include "../arch_x86/port.h"
