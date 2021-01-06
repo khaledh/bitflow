@@ -8,72 +8,90 @@ QEMU := qemu-system-i386
 CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP -mgeneral-regs-only
 LDFLAGS := --oformat=binary
 
-%.o: %.c
+SRCDIR := src
+BLDDIR := build
+
+$(BLDDIR)/%.o: $(SRCDIR)/%.c
 	$(GCC) $(CFLAGS) -c $< -o $@
 
 ##
 # boot sector
 #
-src/arch_x86/bootsect.bin: src/arch_x86/bootsect.asm
+$(BLDDIR)/bootsect.bin: $(SRCDIR)/arch_x86/bootsect.asm
 	$(NASM) $< -o $@
 
 ##
 # kernel
 #
-src/arch_x86/task_switch.o: src/arch_x86/task_switch.asm
+$(BLDDIR)/arch_x86/task_switch.o: $(SRCDIR)/arch_x86/task_switch.asm
 	$(NASM) -felf32 $< -o $@
 
 KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain # --print-map
 
 KERNEL_SRCS = \
-	src/arch_x86/cpu.c \
-	src/arch_x86/idt.c \
-	src/arch_x86/port.c \
-	src/device/ata.c \
-	src/device/console.c \
-	src/device/kbd.c \
-	src/device/keyboard.c \
-	src/device/pic.c \
-	src/device/pit.c \
-	src/kernel/kvector.c \
-	src/kernel/loader.c \
-	src/kernel/scheduler.c \
-	src/kernel/task.c \
-	src/kernel/util.c \
-	src/kernel/kernel.c \
-	src/shell/shell.c
-KERNEL_OBJS = $(KERNEL_SRCS:.c=.o) src/arch_x86/task_switch.o
-KERNEL_DEPS = $(KERNEL_SRCS:.c=.d)
+	$(SRCDIR)/arch_x86/cpu.c \
+	$(SRCDIR)/arch_x86/idt.c \
+	$(SRCDIR)/arch_x86/port.c \
+	$(SRCDIR)/device/ata.c \
+	$(SRCDIR)/device/console.c \
+	$(SRCDIR)/device/kbd.c \
+	$(SRCDIR)/device/keyboard.c \
+	$(SRCDIR)/device/pic.c \
+	$(SRCDIR)/device/pit.c \
+	$(SRCDIR)/kernel/kvector.c \
+	$(SRCDIR)/kernel/loader.c \
+	$(SRCDIR)/kernel/scheduler.c \
+	$(SRCDIR)/kernel/task.c \
+	$(SRCDIR)/kernel/util.c \
+	$(SRCDIR)/kernel/kernel.c \
+	$(SRCDIR)/shell/shell.c
 
-kernel.bin: $(KERNEL_OBJS) src/kernel/kernel.ld
-	$(LD) $(KERNEL_LDFLAGS) $(KERNEL_OBJS) -T src/kernel/kernel.ld -o $@
+KERNEL_OBJS = \
+	$(patsubst $(SRCDIR)/%.c, $(BLDDIR)/%.o, $(KERNEL_SRCS)) \
+	$(BLDDIR)/arch_x86/task_switch.o
+
+KERNEL_DEPS = \
+	$(patsubst $(SRCDIR)/%.c, $(BLDDIR)/%.d, $(KERNEL_SRCS))
+
+$(BLDDIR)/kernel.bin: $(KERNEL_OBJS) $(SRCDIR)/kernel/kernel.ld
+	$(LD) $(KERNEL_LDFLAGS) $(KERNEL_OBJS) -T $(SRCDIR)/kernel/kernel.ld -o $@
+
+$(shell mkdir -p $(dir $(KERNEL_OBJS)) >/dev/null)
 
 ##
 # tasks
 #
-task_a.bin: src/tasks/task_a.o src/tasks/task.ld
-	$(LD) $(LDFLAGS) $< -T src/tasks/task.ld -o $@
+$(BLDDIR)/task_a.bin: $(BLDDIR)/tasks/task_a.o $(SRCDIR)/tasks/task.ld
+	$(LD) $(LDFLAGS) $< -T $(SRCDIR)/tasks/task.ld -o $@
 
-task_b.bin: src/tasks/task_b.o src/tasks/task.ld
-	$(LD) $(LDFLAGS) $< -T src/tasks/task.ld -o $@
+$(BLDDIR)/task_b.bin: $(BLDDIR)/tasks/task_b.o $(SRCDIR)/tasks/task.ld
+	$(LD) $(LDFLAGS) $< -T $(SRCDIR)/tasks/task.ld -o $@
+
+$(shell mkdir -p $(BLDDIR)/tasks >/dev/null)
 
 ##
 # OS image
 
-os.img: src/arch_x86/bootsect.bin kernel.bin task_a.bin task_b.bin
-	cat $^ > os.img
+$(BLDDIR)/os.img: $(BLDDIR)/bootsect.bin $(BLDDIR)/kernel.bin $(BLDDIR)/task_a.bin $(BLDDIR)/task_b.bin
+	cat $^ > $@
 
 ##
 # other targets
 #
 .PHONY: all run clean
 
-all: os.img
+all: $(BLDDIR)/os.img
 
-run: os.img
+run: $(BLDDIR)/os.img
 	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio -no-shutdown -no-reboot # -d int
 
 clean:
-	$(RM) $(KERNEL_OBJS) $(KERNEL_DEPS) src/tasks/task_*.o src/tasks/task_*.d src/arch_x86/*.bin *.bin os.img
+	$(RM) \
+		$(KERNEL_OBJS) \
+		$(KERNEL_DEPS) \
+		$(BLDDIR)/tasks/task_*.o \
+		$(BLDDIR)/tasks/task_*.d \
+		$(BLDDIR)/*.bin \
+		$(BLDDIR)/os.img
 
 -include $(deps)
