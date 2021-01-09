@@ -1,3 +1,3 @@
 #pragma once
 
-void timer_init();
+void pit_init();

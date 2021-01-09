@@ -2,15 +2,19 @@
  * Task Scheduler
  */
 
+#include "../device/console.h"
 #include "scheduler.h"
-#include "task.h"
 
 extern thread_t* current_tcb;
-extern void switch_to_thread(thread_t* next_thread);
 
-void schedule() {
-    while (current_tcb->next->status == 0) {
+uint32_t schedule(uint32_t esp) {
+    current_tcb->esp = esp;
+
+    int i = 0;
+    do {
         current_tcb = current_tcb->next;
-    }
-    switch_to_thread(current_tcb->next);
+        i++;
+    } while (current_tcb->status == 0);
+
+    return current_tcb->esp;
 }

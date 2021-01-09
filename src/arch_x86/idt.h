@@ -4,4 +4,4 @@
 #include "../kernel/interrupt.h"
 
 void idt_init();
-void idt_set(uint8_t vector, interrupt_handler_t handler);
+void idt_set(uint8_t vector, void (*handler)());

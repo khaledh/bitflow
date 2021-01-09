@@ -90,19 +90,19 @@ void print(const char* str) {
 }
 
 void print_hex8(uint8_t value) {
-    char hex[] = "__";
+    char hex[] = "__\0";
     to_hex8(value, hex);
     print(hex);
 }
 
 void print_hex16(uint16_t value) {
-    char hex[] = "____";
+    char hex[] = "____\0";
     to_hex16(value, hex);
     print(hex);
 }
 
 void print_hex32(uint32_t value) {
-    char hex[] = "________";
+    char hex[] = "________\0";
     to_hex32(value, hex);
     print(hex);
 }

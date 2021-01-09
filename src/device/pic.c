@@ -6,6 +6,7 @@
 #include "../arch_x86/idt.h"
 #include "../arch_x86/port.h"
 #include "pic.h"
+#include "console.h"
 
 #define IRQ_BASE_VECTOR 0x20
 
@@ -95,22 +96,6 @@ void irq_enable_all() {
 }
 
 /**
- * Initialize PICs.
- */
-void irq_init() {
-    remap_pic();
-    irq_disable_all();
-}
-
-/**
- * Install an IRQ handler.
- */
-void irq_install(uint8_t irq_no, interrupt_handler_t irq_handler) {
-    idt_set(IRQ_BASE_VECTOR + irq_no, irq_handler);
-    irq_enable(irq_no);
-}
-
-/**
  * Send End of Interrupt to PICs.
  */
 void irq_eoi(uint8_t irq_no) {
@@ -118,4 +103,44 @@ void irq_eoi(uint8_t irq_no) {
         port_out8(PIC2_COMMAND, PIC_EOI);
     }
     port_out8(PIC1_COMMAND, PIC_EOI);
+}
+
+interrupt_handler_t irq_handlers[16] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+/**
+ * Install an IRQ handler.
+ */
+void irq_install(uint8_t irq_no, interrupt_handler_t irq_handler) {
+    if (irq_no >= 16) {
+        return;
+    }
+    irq_handlers[irq_no] = irq_handler;
+    irq_enable(irq_no);
+}
+
+uint32_t handle_irq(interrupt_frame_t* frame) {
+    uint32_t irq_no = frame->int_no - IRQ_BASE_VECTOR;
+
+    // ack interrupt
+    irq_eoi(frame->int_no);
+
+    if (irq_no >= 16) {
+        return 0;
+    }
+    if (irq_handlers[irq_no] == 0) {
+        return 0;
+    }
+
+    return irq_handlers[irq_no](frame);
+}
+
+/**
+ * Initialize PICs.
+ */
+void pic_init() {
+    remap_pic();
+    irq_disable_all();
 }

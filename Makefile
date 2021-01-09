@@ -23,6 +23,9 @@ $(BLDDIR)/bootsect.bin: $(SRCDIR)/arch_x86/bootsect.asm
 ##
 # kernel
 #
+$(BLDDIR)/kernel/isr.o: $(SRCDIR)/kernel/isr.asm
+	$(NASM) -felf32 $< -o $@
+
 $(BLDDIR)/arch_x86/task_switch.o: $(SRCDIR)/arch_x86/task_switch.asm
 	$(NASM) -felf32 $< -o $@
 
@@ -38,6 +41,8 @@ KERNEL_SRCS = \
 	$(SRCDIR)/device/keyboard.c \
 	$(SRCDIR)/device/pic.c \
 	$(SRCDIR)/device/pit.c \
+	$(SRCDIR)/kernel/exceptions.c \
+	$(SRCDIR)/kernel/interrupt.c \
 	$(SRCDIR)/kernel/kvector.c \
 	$(SRCDIR)/kernel/loader.c \
 	$(SRCDIR)/kernel/scheduler.c \
@@ -48,6 +53,7 @@ KERNEL_SRCS = \
 
 KERNEL_OBJS = \
 	$(patsubst $(SRCDIR)/%.c, $(BLDDIR)/%.o, $(KERNEL_SRCS)) \
+	$(BLDDIR)/kernel/isr.o \
 	$(BLDDIR)/arch_x86/task_switch.o
 
 KERNEL_DEPS = \

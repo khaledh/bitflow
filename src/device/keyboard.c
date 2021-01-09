@@ -9,6 +9,9 @@
 #include "keyboard.h"
 #include "pic.h"
 
+#define KEYBOARD_DATA   0x60
+#define KEYBOARD_STATUS 0x64
+
 #define MAX_ITEMS    65
 #define next(pos)    ((pos + 1) % MAX_ITEMS)
 
@@ -38,7 +41,7 @@ static char dequeue() {
 *  comments in to give you an idea of what key is what, even
 *  though I set it's array index to 0. You can change that to
 *  whatever you want using a macro, if you wish! */
-uint8_t kbd_us[128] = {
+char kbd_us[128] = {
     [0x00] = 0,                     [0x1E] = 'a',                   [0x3C] = 0,    /* F2 */
     [0x01] = 0x1B, /* Esc */        [0x1F] = 's',                   [0x3D] = 0,    /* F3 */
     [0x02] = '1',                   [0x20] = 'd',                   [0x3E] = 0,    /* F4 */
@@ -71,7 +74,7 @@ uint8_t kbd_us[128] = {
     [0x1D] = 0,    /* Ctrl (L) */   [0x3B] = 0,    /* F1 */         
 };
 
-uint8_t kbd_us_shift[128] = {
+char kbd_us_shift[128] = {
     [0x00] = 0,                     [0x1E] = 'A',
     [0x01] = 0,                     [0x1F] = 'S',
     [0x02] = '!',                   [0x20] = 'D',
@@ -105,48 +108,64 @@ uint8_t kbd_us_shift[128] = {
 };
 
 int shift = 0;
+int ctrl  = 0;
+int alt   = 0;
 
-__attribute__ ((interrupt))
-static void handle_interrupt(interrupt_frame_t* frame) {
-    uint8_t scancode = port_in8(0x60);
+static uint32_t handle_interrupt(interrupt_frame_t* frame) {
+    uint8_t scancode = port_in8(KEYBOARD_DATA);
 
 //    print_hex8(scancode);
 //    print(" ");
-//    irq_eoi(1);
-//    return;
+//    return 0;
 
     /* If the top bit of the byte we read from the keyboard is
     *  set, that means that a key has just been released */
     if (scancode & 0x80) {
         /* You can use this one to see if the user released the
         *  shift, alt, or control keys... */
-       scancode &= ~0x80;
-       if (scancode == 0x2A || scancode == 0x36) {
-           shift = 0;
-       }
-    } else {
-       if (scancode == 0x2A || scancode == 0x36) {
-           shift = 1;
-       }
-        /* Here, a key was just pressed. Please note that if you
-        *  hold a key down, you will get repeated key press
-        *  interrupts. */
+        scancode &= ~0x80;
+        switch (scancode) {
+            case 0x2A:
+            case 0x36:
+                shift = 0;
+                break;
 
-        /* Just to show you how this works, we simply translate
-        *  the keyboard scancode into an ASCII value, and then
-        *  display it to the screen. You can get creative and
-        *  use some flags to see if a shift is pressed and use a
-        *  different layout, or you can add another 128 entries
-        *  to the above layout to correspond to 'shift' being
-        *  held. If shift is held using the larger lookup table,
-        *  you would add 128 to the scancode when you look for it */
-        char ch = shift ? kbd_us_shift[scancode] : kbd_us[scancode];
-        enqueue(ch);
-        write_char(ch, (GRAY_LT << 4 | RED));
+            case 0x1D:
+                ctrl = 0;
+                break;
+
+            case 0x38:
+                alt = 0;
+                break;
+
+            default:
+                break;
+        }
+    } else {
+        char ch;
+        switch (scancode) {
+            case 0x2A:
+            case 0x36:
+                shift = 1;
+                break;
+
+            case 0x1D:
+                ctrl = 1;
+                break;
+
+            case 0x38:
+                alt = 1;
+                break;
+
+            default:
+                ch = shift ? kbd_us_shift[scancode] : kbd_us[scancode];
+                enqueue(ch);
+                write_char(ch, (GRAY_LT << 4 | RED));
+                break;
+        }
     }
 
-    // send end of interrupt
-    irq_eoi(1);
+    return 0;
 }
 
 /**

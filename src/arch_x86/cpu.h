@@ -1,4 +1,4 @@
 #pragma once
 
 void idle();
-void halt();
+_Noreturn void halt();

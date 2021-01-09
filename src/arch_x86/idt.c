@@ -31,10 +31,11 @@ void idt_init() {
     idt_desc.limit = (sizeof(gate_desc_t) * 256) - 1;
     idt_desc.base = idt;
 
+    // load IDT descriptor into CPU
     asm("lidt %0" : : "m"(idt_desc));
 };
 
-void idt_set(uint8_t vector, interrupt_handler_t handler) {
+void idt_set(uint8_t vector, isr_t handler) {
     idt[vector].segment_sel = 0x08; // code segment
     idt[vector].offset_lo = (uint32_t)handler & 0xffff;
     idt[vector].offset_hi = (uint32_t)handler >> 16;

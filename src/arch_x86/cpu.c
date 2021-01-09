@@ -10,6 +10,7 @@ void idle() {
     }
 }
 
+_Noreturn
 void halt() {
     asm("cli \n"
         "hlt");

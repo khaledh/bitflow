@@ -1,3 +1,5 @@
 #pragma once
 
-void schedule();
+#include "task.h"
+
+uint32_t schedule(uint32_t);

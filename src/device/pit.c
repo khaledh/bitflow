@@ -4,7 +4,8 @@
 
 #include "../arch_x86/port.h"
 #include "../kernel/interrupt.h"
-#include "../kernel/task.h"
+#include "../kernel/scheduler.h"
+#include "../kernel/util.h"
 #include "console.h"
 #include "pic.h"
 #include "pit.h"
@@ -19,6 +20,8 @@
 
 #define TIMER_HZ 100
 
+extern thread_t* current_tcb;
+
 void set_frequency(uint16_t hz) {
     uint16_t divisor = PIT_FREQUENCY / hz;
 
@@ -31,26 +34,26 @@ void set_frequency(uint16_t hz) {
 
 void tick() {
     static char spinner[] = { '-', '\\', '|', '/' };
-    static int counter = 0;
     static int tick = 0;
     if (tick++ % 5 == 0) {
-        put_char(spinner[counter++ % 4], (GRAY_DK << 4 | WHITE), 24, 0);
+        put_char(spinner[tick % 4], (GRAY_DK << 4 | WHITE), 24, 0);
     }
+    char msg[] = "________\0";
+    to_hex32(tick, msg);
+    put_str(msg, (GRAY_DK << 4 | WHITE), 24, 2);
+    to_hex8(current_tcb->id, msg);
+    put_str(msg, (GRAY_DK << 4 | WHITE), 24, 11);
 }
 
-__attribute__ ((interrupt))
-static void handle_interrupt(interrupt_frame_t* frame) {
-    // ack interrupt
-    irq_eoi(0);
-
+uint32_t handle_interrupt(interrupt_frame_t* frame) {
     tick();
-    schedule();
+    return schedule(frame->esp);
 }
 
 /**
  * Install the timer IRQ handler at IRQ0.
  */
-void timer_init() {
+void pit_init() {
     set_frequency(TIMER_HZ);
     irq_install(0, handle_interrupt);
 }
