@@ -86,7 +86,7 @@ void print_char(unsigned char ch) {
     write_char(ch, DEFAULT_COLOR);
 }
 
-void print(const unsigned char* str) {
+void print(const char* str) {
     write_str(str, DEFAULT_COLOR);
 }
 

@@ -21,15 +21,6 @@ thread_t* current_tcb = &threads[0];
 uint32_t stacks[8][STACK_SIZE];
 
 
-void thread(int tid) {
-    for (int row = (tid * 3 - 3); row < (tid * 3 - 1); row++) {
-        for (int col = 0; col < 80; col++) {
-            put_char('.', (BLACK << 4 | tid), row, col);
-            for (int i=0; i<250000; i++);
-        }
-    }
-}
-
 void add_task(thread_t* t) {
 //    thread_t* curr = thread_list;
 //    thread_t* next = curr->next;
@@ -100,13 +91,4 @@ void tasking_init() {
     threads[0].id = n_tasks++;
     threads[0].status = 1;
     threads[0].next = &threads[0];
-
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
 }

@@ -12,6 +12,7 @@
 #include "exceptions.h"
 #include "task.h"
 
+void thread(int tid);
 
 void kmain() {
     disable_cursor();
@@ -26,14 +27,26 @@ void kmain() {
     keyboard_init();
     tasking_init();
 
-//    create_task(shell);
+    create_task(thread);
+    create_task(thread);
+    create_task(thread);
+    create_task(thread);
+    create_task(thread);
+    create_task(thread);
+    create_task(thread);
 
-//     exec("task_a");
-//     exec("task_b");
+    create_task(shell);
 
     asm("sti");
 
-//    shell();
-
     idle();
+}
+
+void thread(int tid) {
+    for (int row = (tid * 3); row < (tid * 3 + 2); row++) {
+        for (int col = 0; col < 80; col++) {
+            put_char('.', (BLACK << 4 | tid), row, col);
+            for (int i=0; i<250000; i++);
+        }
+    }
 }

@@ -6,8 +6,9 @@
 #include "../kernel/kvector.h"
 
 typedef void (*put_str_t)(const char*, char, int, int);
+typedef void (*print_t)(const char*);
 
 void entry(kernel_vector_t kvectors[]) {
-    put_str_t kput_str = (put_str_t)kvectors[KVECT_PUT_STR];
-    kput_str("Task A", WHITE_ON_BLUE, 1, 0);
+    print_t kprint = (print_t)kvectors[KVECT_PRINT];
+    kprint("Task A");
 }

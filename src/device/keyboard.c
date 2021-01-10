@@ -19,7 +19,7 @@ static char buf[MAX_ITEMS];
 static int front = 0;
 static int rear = 0;
 
-static void enqueue(char ch) {
+static void enqueue_char(char ch) {
     if (next(rear) == front) {
         return;
     }
@@ -27,7 +27,7 @@ static void enqueue(char ch) {
     rear = next(rear);
 }
 
-static char dequeue() {
+char dequeue_char() {
     if (rear == front) {
         return 0;
     }
@@ -159,8 +159,8 @@ static uint32_t handle_interrupt(interrupt_frame_t* frame) {
 
             default:
                 ch = shift ? kbd_us_shift[scancode] : kbd_us[scancode];
-                enqueue(ch);
-                write_char(ch, (GRAY_LT << 4 | RED));
+                enqueue_char(ch);
+//                write_char(ch, (GRAY_LT << 4 | RED));
                 break;
         }
     }

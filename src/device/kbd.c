@@ -6,6 +6,7 @@
 #include "../arch_x86/port.h"
 #include "console.h"
 #include "kbd.h"
+#include "keyboard.h"
 
 #define KEYBOARD_DATA   0x60
 #define KEYBOARD_STATUS 0x64
@@ -31,15 +32,29 @@ uint8_t read_scancode() {
 }
 
 char read_char() {
-    uint8_t scancode;
-    while ((scancode = read_scancode()) > 0x32);
+//    uint8_t scancode;
+//    while ((scancode = read_scancode()) > 0x32);
+//
+//    char ch = scancode_to_ascii[scancode];
+//    print_char(ch);
+//    return ch;
 
-    char ch = scancode_to_ascii[scancode];
-    print_char(ch);
+    char ch;
+    while ((ch = dequeue_char()) == 0) {
+        asm("pause");
+    }
+    write_char(ch, (BLACK << 4 | YELLOW));
     return ch;
 }
 
 void read_line(char buf[], size_t size) {
+//    int i = 0;
+//    char ch;
+//    while (i < (size - 1) && (ch = read_char()) != '\n') {
+//        buf[i++] = ch;
+//    }
+//    buf[i] = 0;
+
     int i = 0;
     char ch;
     while (i < (size - 1) && (ch = read_char()) != '\n') {

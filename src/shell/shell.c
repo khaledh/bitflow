@@ -14,10 +14,14 @@ void shell() {
     print("\n> ");
     read_line(name, 32);
     while (strcmp(name, "quit") != 0) {
-        if (exec(name) != 0) {
-            print("Task not found.");
+        int len = strlen(name);
+        if (len > 0) {
+            if (exec(name) != 0) {
+                print("Task not found.");
+            }
+            print("\n");
         }
-        print("\n> ");
+        print("> ");
         read_line(name, 32);
     }
 
