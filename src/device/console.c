@@ -17,7 +17,7 @@
 uint16_t* const video_memory = (uint16_t* const)VIDEO_MEMORY_ADDR;
 uint16_t current_offset = 0;
 
-int put_char_at(char ch, char attr, int offset) {
+int put_char_at(unsigned char ch, char attr, int offset) {
     int advance = 1;
     if (ch == '\n') {
         return offset + (SCREEN_COLS - COL(offset));
@@ -66,27 +66,27 @@ void clear_screen() {
     current_offset = 0;
 }
 
-void put_char(char ch, char attr, int row, int col) {
+void put_char(unsigned char ch, char attr, int row, int col) {
     put_char_at(ch, attr, OFFSET(row, col));
 }
 
-void put_str(const char* str, char attr, int row, int col) {
+void put_str(const unsigned char* str, char attr, int row, int col) {
     put_str_at(str, attr, OFFSET(row, col));
 }
 
-void write_char(char ch, char attr) {
+void write_char(unsigned char ch, char attr) {
     current_offset = put_char_at(ch, attr, current_offset);
 }
 
-void write_str(const char* str, char attr) {
+void write_str(const unsigned char* str, char attr) {
     current_offset = put_str_at(str, attr, current_offset);
 }
 
-void print_char(char ch) {
+void print_char(unsigned char ch) {
     write_char(ch, DEFAULT_COLOR);
 }
 
-void print(const char* str) {
+void print(const unsigned char* str) {
     write_str(str, DEFAULT_COLOR);
 }
 

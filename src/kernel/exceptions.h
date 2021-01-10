@@ -1,4 +1,4 @@
 #pragma once
 
-void install_exception_handlers();
+void exceptions_init();
 uint32_t handle_exception(interrupt_frame_t* frame);

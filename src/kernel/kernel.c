@@ -20,21 +20,13 @@ void kmain() {
     print("Booting kernel...\n");
 
     idt_init();
-    print("IDT initialized.\n");
-
-    install_exception_handlers();
-    print("Exception handlers installed.\n");
-
+    exceptions_init();
     pic_init();
-    print("PIC initialized.\n");
-
     pit_init();
     keyboard_init();
     tasking_init();
 
-//    thread_t shell_task;
-//    uint32_t shell_stack[128];
-//    create_task(&shell_task, &shell_stack, shell);
+//    create_task(shell);
 
 //     exec("task_a");
 //     exec("task_b");

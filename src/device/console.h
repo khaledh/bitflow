@@ -27,14 +27,14 @@
 
 void clear_screen();
 
-void put_char(char ch, char attr, int row, int col);
-void put_str(const char* str, char attr, int row, int col);
+void put_char(unsigned char ch, char attr, int row, int col);
+void put_str(unsigned const char* str, char attr, int row, int col);
 
-void write_char(char ch, char attr);
-void write_str(const char* str, char attr);
+void write_char(unsigned char ch, char attr);
+void write_str(const unsigned char* str, char attr);
 
-void print_char(char ch);
-void print(const char* str);
+void print_char(unsigned char ch);
+void print(const unsigned char* str);
 
 void print_hex8(uint8_t value);
 void print_hex16(uint16_t value);

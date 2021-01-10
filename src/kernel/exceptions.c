@@ -74,7 +74,7 @@ extern isr_t isr46;
 extern isr_t isr47;
 
 
-void install_exception_handlers() {
+void exceptions_init() {
     idt_set(0, &isr00);
     idt_set(1, &isr01);
     idt_set(2, &isr02);
