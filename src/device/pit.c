@@ -18,9 +18,11 @@
 #define PIT_RW_LSB_MSB  0b00110000
 #define PIT_MODE_SQUARE 0b00000110
 
-#define TIMER_HZ 100
+#define TIMER_HZ 250
 
 extern thread_t* current_tcb;
+
+static uint32_t ticks = 0;
 
 void set_frequency(uint16_t hz) {
     uint16_t divisor = PIT_FREQUENCY / hz;
@@ -34,13 +36,18 @@ void set_frequency(uint16_t hz) {
 
 void tick() {
     static char spinner[] = { '-', '\\', '|', '/' };
-    static int tick = 0;
-    if (tick++ % 5 == 0) {
-        put_char(spinner[tick % 4], (GRAY_DK << 4 | WHITE), 24, 0);
+    static int count = 0;
+    static char msg[] = "________\0";
+
+    ticks++;
+
+    if ((ticks & 0xF) == 0) { // mod 16
+        put_char(spinner[count++ % 4], (GRAY_DK << 4 | WHITE), 24, 0);
     }
-    char msg[] = "________\0";
-    to_hex32(tick, msg);
+
+    to_hex32(ticks, msg);
     put_str(msg, (GRAY_DK << 4 | WHITE), 24, 2);
+
     to_hex8(current_tcb->id, msg);
     put_str(msg, (GRAY_DK << 4 | WHITE), 24, 11);
 }

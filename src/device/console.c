@@ -3,6 +3,7 @@
  */
 
 #include <stdint.h>
+#include "../arch_x86/port.h"
 #include "../kernel/util.h"
 #include "console.h"
 
@@ -105,4 +106,12 @@ void print_hex32(uint32_t value) {
     char hex[] = "________\0";
     to_hex32(value, hex);
     print(hex);
+}
+
+#define VGA_CRTC_ADDR 0x3D4
+#define VGA_CRTC_DATA 0x3D5
+
+void disable_cursor() {
+    port_out8(VGA_CRTC_ADDR, 0x0A); // select register index
+    port_out8(VGA_CRTC_DATA, 0x20); // set bit-5 to disable cursor
 }

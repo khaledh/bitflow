@@ -39,3 +39,5 @@ void print(const char* str);
 void print_hex8(uint8_t value);
 void print_hex16(uint16_t value);
 void print_hex32(uint32_t value);
+
+void disable_cursor();

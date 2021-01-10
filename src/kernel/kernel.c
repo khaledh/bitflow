@@ -14,6 +14,7 @@
 
 
 void kmain() {
+    disable_cursor();
     clear_screen();
 
     print("Booting kernel...\n");
