@@ -7,7 +7,7 @@
 #include "../device/ata.h"
 #include "kvector.h"
 #include "loader.h"
-#include "util.h"
+#include "../lib/util.h"
 
 #define TASK_LOAD_ADDR 0xf000
 
@@ -20,14 +20,14 @@ typedef struct {
     uint32_t sector;
 } task_map_t;
 
-task_map_t tasks[] = {
-    { "task_a", 52 },
-    { "task_b", 53 },
+task_map_t task_dir[] = {
+    { "task_a", 57 },
+    { "task_b", 58 },
     { NULL,     0 }
 };
 
 int lookup_task_sector(const char* name) {
-    for (task_map_t *t = tasks; t->name != NULL; t++) {
+    for (task_map_t *t = task_dir; t->name != NULL; t++) {
         if (strcmp(t->name, name) == 0) {
             return t->sector;
         }

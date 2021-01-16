@@ -46,9 +46,10 @@ KERNEL_SRCS = \
 	$(SRCDIR)/kernel/kvector.c \
 	$(SRCDIR)/kernel/loader.c \
 	$(SRCDIR)/kernel/task.c \
-	$(SRCDIR)/kernel/util.c \
 	$(SRCDIR)/kernel/kernel.c \
 	$(SRCDIR)/kernel/scheduler.c \
+	$(SRCDIR)/lib/queue.c \
+	$(SRCDIR)/lib/util.c \
 	$(SRCDIR)/shell/shell.c
 
 KERNEL_OBJS = \

@@ -6,7 +6,7 @@
 #include "../device/console.h"
 #include "../device/kbd.h"
 #include "../kernel/loader.h"
-#include "../kernel/util.h"
+#include "../lib/util.h"
 
 void shell() {
     char name[32];

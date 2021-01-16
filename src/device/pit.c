@@ -5,7 +5,7 @@
 #include "../arch_x86/port.h"
 #include "../kernel/interrupt.h"
 #include "../kernel/scheduler.h"
-#include "../kernel/util.h"
+#include "../lib/util.h"
 #include "console.h"
 #include "pic.h"
 #include "pit.h"
@@ -20,7 +20,7 @@
 
 #define TIMER_HZ 250
 
-extern thread_t* current_tcb;
+extern task_t* current_task;
 
 static uint32_t ticks = 0;
 
@@ -48,13 +48,13 @@ void tick() {
     to_hex32(ticks, msg);
     put_str(msg, (GRAY_DK << 4 | WHITE), 24, 2);
 
-    to_hex8(current_tcb->id, msg);
+    to_hex8(current_task->id, msg);
     put_str(msg, (GRAY_DK << 4 | WHITE), 24, 11);
 }
 
 uint32_t handle_interrupt(interrupt_frame_t* frame) {
     tick();
-    return schedule(frame->esp);
+    return schedule(frame->esp, READY);
 }
 
 /**

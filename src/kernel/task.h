@@ -1,13 +1,23 @@
 #pragma once
 
 #include <stdint.h>
+#include "../lib/queue.h"
 
-typedef struct thread {
+typedef enum task_state {
+    READY,
+    RUNNING,
+    BLOCKED,
+    TERMINATED
+} task_state_t;
+
+typedef struct task {
     uint32_t esp;
     uint32_t id;
-    uint32_t status;
-    struct thread* next;
-} thread_t;
+    task_state_t state;
+    queue_t* keybuf;
+    struct task* next;
+} task_t;
 
 void tasking_init();
-void create_task();
+task_t* create_task(void (entry_point)());
+task_t* get_current_task();

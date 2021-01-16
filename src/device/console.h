@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "../kernel/task.h"
 
 // text mode colors
 #define BLACK       0x0
@@ -41,3 +42,8 @@ void print_hex16(uint16_t value);
 void print_hex32(uint32_t value);
 
 void disable_cursor();
+
+
+void set_active_task(task_t* task);
+
+void handle_key_event(char ch);

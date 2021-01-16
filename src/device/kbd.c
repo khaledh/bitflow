@@ -7,6 +7,8 @@
 #include "console.h"
 #include "kbd.h"
 #include "keyboard.h"
+#include "../lib/queue.h"
+#include "../kernel/task.h"
 
 #define KEYBOARD_DATA   0x60
 #define KEYBOARD_STATUS 0x64
@@ -40,7 +42,7 @@ char read_char() {
 //    return ch;
 
     char ch;
-    while ((ch = dequeue_char()) == 0) {
+    while ((ch = dequeue(get_current_task()->keybuf)) == 0) {
         asm("pause");
     }
     write_char(ch, (BLACK << 4 | YELLOW));
@@ -58,7 +60,11 @@ void read_line(char buf[], size_t size) {
     int i = 0;
     char ch;
     while (i < (size - 1) && (ch = read_char()) != '\n') {
-        buf[i++] = ch;
+        if (ch == '\b') {
+            i--;
+        } else {
+            buf[i++] = ch;
+        }
     }
     buf[i] = 0;
 }

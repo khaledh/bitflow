@@ -24,18 +24,20 @@ void kmain() {
     exceptions_init();
     pic_init();
     pit_init();
-    keyboard_init();
+    keyboard_init(handle_key_event);
     tasking_init();
 
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
-    create_task(thread);
 
-    create_task(shell);
+//    create_task(thread);
+//    create_task(thread);
+//    create_task(thread);
+//    create_task(thread);
+//    create_task(thread);
+//    create_task(thread);
+//    create_task(thread);
+
+    task_t* shell_task = create_task(shell);
+    set_active_task(shell_task);
 
     asm("sti");
 

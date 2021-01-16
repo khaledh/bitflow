@@ -5,25 +5,26 @@
 #include "../arch_x86/cpu.h"
 #include "../device/console.h"
 #include "task.h"
-#include "util.h"
+#include "../lib/queue.h"
+#include "../lib/util.h"
 
 #define STACK_SIZE 512
 
-//thread_t t0, t1, t2;
-//thread_t* current_tcb = &t0;
-//thread_t* thread_list = &t0;
+//task_t t0, t1, t2;
+//task_t* current_task = &t0;
+//task_t* thread_list = &t0;
 
 uint32_t n_tasks = 0;
 
-thread_t threads[16];
-thread_t* current_tcb = &threads[0];
+task_t tasks[16];
+task_t* current_task = &tasks[0];
 
 uint32_t stacks[8][STACK_SIZE];
 
 
-void add_task(thread_t* t) {
-//    thread_t* curr = thread_list;
-//    thread_t* next = curr->next;
+void add_task(task_t* t) {
+//    task_t* curr = thread_list;
+//    task_t* next = curr->next;
 //    while (next != thread_list) {
 //        curr = curr->next;
 //        next = curr->next;
@@ -31,13 +32,13 @@ void add_task(thread_t* t) {
 //    curr->next = t;
 //    t->next = next;
 
-    threads[t->id - 1].next = t;
-    threads[t->id].next = &threads[0];
+    tasks[t->id - 1].next = t;
+    tasks[t->id].next = &tasks[0];
 }
 
-//void del_task(thread_t* t) {
-//    thread_t* prev = thread_list;
-//    thread_t* curr = prev->next;
+//void del_task(task_t* t) {
+//    task_t* prev = thread_list;
+//    task_t* curr = prev->next;
 //    while (curr != t && prev->next != thread_list) {
 //        prev = prev->next;
 //        curr = prev->next;
@@ -48,16 +49,16 @@ void add_task(thread_t* t) {
 //}
 
 void end_task() {
-//    if (current_tcb == t) {
-//        current_tcb = current_tcb->next;
+//    if (current_task == t) {
+//        current_task = current_task->next;
 //    }
 //    del_task(t);
-    current_tcb->status = 0;
+    current_task->state = TERMINATED;
     idle();
 }
 
-void create_task(void (*entry_point)()) {
-    thread_t* t = &threads[n_tasks];
+task_t* create_task(void (*entry_point)()) {
+    task_t* t = &tasks[n_tasks];
     uint32_t* stack = &stacks[n_tasks - 1][STACK_SIZE];
 
     push(stack, n_tasks);           // task id
@@ -81,14 +82,21 @@ void create_task(void (*entry_point)()) {
     push(stack, 0x10);                  // gs
 
     t->esp = (uint32_t)stack;
-    t->status = 1;
+    t->state = READY;
     t->id = n_tasks++;
+    t->keybuf = create_queue();
 
     add_task(t);
+
+    return t;
+}
+
+task_t* get_current_task() {
+    return current_task;
 }
 
 void tasking_init() {
-    threads[0].id = n_tasks++;
-    threads[0].status = 1;
-    threads[0].next = &threads[0];
+    tasks[0].id = n_tasks++;
+    tasks[0].state = RUNNING;
+    tasks[0].next = &tasks[0];
 }

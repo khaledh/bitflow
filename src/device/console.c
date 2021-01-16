@@ -4,8 +4,10 @@
 
 #include <stdint.h>
 #include "../arch_x86/port.h"
-#include "../kernel/util.h"
+#include "../lib/util.h"
 #include "console.h"
+#include "../kernel/task.h"
+#include "../lib/queue.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25
@@ -114,4 +116,16 @@ void print_hex32(uint32_t value) {
 void disable_cursor() {
     port_out8(VGA_CRTC_ADDR, 0x0A); // select register index
     port_out8(VGA_CRTC_DATA, 0x20); // set bit-5 to disable cursor
+}
+
+task_t* active_task = 0;
+
+void set_active_task(task_t* task) {
+    active_task = task;
+}
+
+void handle_key_event(char ch) {
+    if (active_task) {
+        enqueue(active_task->keybuf, ch);
+    }
 }

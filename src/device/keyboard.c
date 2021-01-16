@@ -5,42 +5,15 @@
 #include <stdint.h>
 #include "../arch_x86/port.h"
 #include "../kernel/interrupt.h"
-#include "console.h"
 #include "keyboard.h"
 #include "pic.h"
 
 #define KEYBOARD_DATA   0x60
 #define KEYBOARD_STATUS 0x64
 
-#define MAX_ITEMS    65
-#define next(pos)    ((pos + 1) % MAX_ITEMS)
 
-static char buf[MAX_ITEMS];
-static int front = 0;
-static int rear = 0;
+static key_event_handler_t event_handler;
 
-static void enqueue_char(char ch) {
-    if (next(rear) == front) {
-        return;
-    }
-    buf[rear] = ch;
-    rear = next(rear);
-}
-
-char dequeue_char() {
-    if (rear == front) {
-        return 0;
-    }
-    char ch = buf[front];
-    front = next(front);
-    return ch;
-}
-
-/* KBDUS means US Keyboard Layout. This is a scancode table
-*  used to layout a standard US keyboard. I have left some
-*  comments in to give you an idea of what key is what, even
-*  though I set it's array index to 0. You can change that to
-*  whatever you want using a macro, if you wish! */
 char kbd_us[128] = {
     [0x00] = 0,                     [0x1E] = 'a',                   [0x3C] = 0,    /* F2 */
     [0x01] = 0x1B, /* Esc */        [0x1F] = 's',                   [0x3D] = 0,    /* F3 */
@@ -126,41 +99,22 @@ static uint32_t handle_interrupt(interrupt_frame_t* frame) {
         scancode &= ~0x80;
         switch (scancode) {
             case 0x2A:
-            case 0x36:
-                shift = 0;
-                break;
-
-            case 0x1D:
-                ctrl = 0;
-                break;
-
-            case 0x38:
-                alt = 0;
-                break;
-
-            default:
-                break;
+            case 0x36: shift = 0; break;
+            case 0x1D: ctrl = 0; break;
+            case 0x38: alt = 0; break;
+            default: break;
         }
     } else {
         char ch;
         switch (scancode) {
             case 0x2A:
-            case 0x36:
-                shift = 1;
-                break;
-
-            case 0x1D:
-                ctrl = 1;
-                break;
-
-            case 0x38:
-                alt = 1;
-                break;
+            case 0x36: shift = 1; break;
+            case 0x1D: ctrl = 1; break;
+            case 0x38: alt = 1; break;
 
             default:
                 ch = shift ? kbd_us_shift[scancode] : kbd_us[scancode];
-                enqueue_char(ch);
-//                write_char(ch, (GRAY_LT << 4 | RED));
+                event_handler(ch);
                 break;
         }
     }
@@ -171,6 +125,7 @@ static uint32_t handle_interrupt(interrupt_frame_t* frame) {
 /**
  * Install the keyboard IRQ handler at IRQ1.
  */
-void keyboard_init() {
+void keyboard_init(key_event_handler_t key_event_handler) {
+    event_handler = key_event_handler;
     irq_install(1, handle_interrupt);
 }
