@@ -84,7 +84,7 @@ int shift = 0;
 int ctrl  = 0;
 int alt   = 0;
 
-static uint32_t handle_interrupt(interrupt_frame_t* frame) {
+static void handle_interrupt(interrupt_frame_t* frame) {
     uint8_t scancode = port_in8(KEYBOARD_DATA);
 
 //    print_hex8(scancode);
@@ -118,8 +118,6 @@ static uint32_t handle_interrupt(interrupt_frame_t* frame) {
                 break;
         }
     }
-
-    return 0;
 }
 
 /**

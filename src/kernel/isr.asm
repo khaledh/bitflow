@@ -284,7 +284,6 @@ isr_common:
 
     mov     [esp + 28], esp         ; store current esp in its position in stack (as pushed by `pusha` above)
     call    isr_handler
-    mov     esp, eax                ; restore esp using the returned value from `isr_handler`
 
     pop     gs
     pop     fs

@@ -36,8 +36,9 @@ void kmain() {
 //    create_task(thread);
 //    create_task(thread);
 
-    task_t* shell_task = create_task(shell);
-    set_active_task(shell_task);
+    task_t* shell1 = create_task(shell);
+    task_t* shell2 = create_task(shell);
+    set_active_task(shell1);
 
     asm("sti");
 

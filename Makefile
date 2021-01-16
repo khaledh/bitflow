@@ -41,6 +41,7 @@ KERNEL_SRCS = \
 	$(SRCDIR)/device/keyboard.c \
 	$(SRCDIR)/device/pic.c \
 	$(SRCDIR)/device/pit.c \
+	$(SRCDIR)/kernel/event.c \
 	$(SRCDIR)/kernel/exceptions.c \
 	$(SRCDIR)/kernel/interrupt.c \
 	$(SRCDIR)/kernel/kvector.c \
@@ -48,6 +49,7 @@ KERNEL_SRCS = \
 	$(SRCDIR)/kernel/task.c \
 	$(SRCDIR)/kernel/kernel.c \
 	$(SRCDIR)/kernel/scheduler.c \
+	$(SRCDIR)/lib/blocking_queue.c \
 	$(SRCDIR)/lib/queue.c \
 	$(SRCDIR)/lib/util.c \
 	$(SRCDIR)/shell/shell.c

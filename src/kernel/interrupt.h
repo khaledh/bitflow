@@ -16,4 +16,4 @@ typedef struct interrupt_frame {
     uint32_t eip, cs, eflags;
 } interrupt_frame_t;
 
-typedef uint32_t (*interrupt_handler_t)(interrupt_frame_t*);
+typedef void (*interrupt_handler_t)(interrupt_frame_t*);

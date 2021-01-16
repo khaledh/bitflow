@@ -3,8 +3,8 @@
 
 #define next(pos) ((pos + 1) % QUEUE_MAX_ITEMS)
 
-queue_t queues[16];
-int nq = 0;
+static queue_t queues[16];
+static int n_queues = 0;
 
 //void printq(queue_t* q) {
 //    print("[f=");
@@ -16,12 +16,12 @@ int nq = 0;
 
 
 queue_t* create_queue() {
-    if (nq >= 16) {
+    if (n_queues >= 16) {
         return 0;
     }
-    queues[nq].front = 0;
-    queues[nq].rear = 0;
-    return &queues[nq++];
+    queues[n_queues].front = 0;
+    queues[n_queues].rear = 0;
+    return &queues[n_queues++];
 }
 
 void enqueue(queue_t* q, char ch) {

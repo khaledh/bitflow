@@ -121,20 +121,20 @@ void irq_install(uint8_t irq_no, interrupt_handler_t irq_handler) {
     irq_enable(irq_no);
 }
 
-uint32_t handle_irq(interrupt_frame_t* frame) {
+void handle_irq(interrupt_frame_t* frame) {
     uint32_t irq_no = frame->int_no - IRQ_BASE_VECTOR;
 
     // ack interrupt
     irq_eoi(frame->int_no);
 
     if (irq_no >= 16) {
-        return 0;
+        return;
     }
     if (irq_handlers[irq_no] == 0) {
-        return 0;
+        return;
     }
 
-    return irq_handlers[irq_no](frame);
+    irq_handlers[irq_no](frame);
 }
 
 /**

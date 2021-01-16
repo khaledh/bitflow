@@ -6,18 +6,32 @@
 #include "scheduler.h"
 
 extern task_t* current_task;
+extern void switch_to_task(task_t*);
+extern void switch_to_new_task(task_t*);
 
-uint32_t schedule(uint32_t esp, task_state_t state) {
-    current_task->esp = esp;
+void schedule(task_state_t state) {
     current_task->state = state;
 
-    do {
-        current_task = current_task->next;
-    } while (current_task->state != READY);
-
-//    print("\nswitched to: ");
+//    print("\nswitching from: ");
 //    print_hex8(current_task->id);
+//    print_hex8(current_task->state);
 
-    current_task->state = RUNNING;
-    return current_task->esp;
+    task_t* next_task = current_task;
+    do {
+        next_task = next_task->next;
+    } while (next_task->state != READY && next_task->state != NEW);
+
+//    print("\nswitching to: ");
+//    print_hex8(next_task->id);
+//    print_hex8(next_task->state);
+
+    if (next_task->state == NEW) {
+//        print("\nswitching to new task");
+        next_task->state = RUNNING;
+        switch_to_new_task(next_task);
+    } else {
+//        print("\nswitching to existing task");
+        next_task->state = RUNNING;
+        switch_to_task(next_task);
+    }
 }

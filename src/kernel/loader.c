@@ -21,8 +21,8 @@ typedef struct {
 } task_map_t;
 
 task_map_t task_dir[] = {
-    { "task_a", 57 },
-    { "task_b", 58 },
+    { "task_a", 59 },
+    { "task_b", 60 },
     { NULL,     0 }
 };
 

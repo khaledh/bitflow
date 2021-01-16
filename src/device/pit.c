@@ -52,9 +52,9 @@ void tick() {
     put_str(msg, (GRAY_DK << 4 | WHITE), 24, 11);
 }
 
-uint32_t handle_interrupt(interrupt_frame_t* frame) {
+void handle_interrupt(interrupt_frame_t* frame) {
     tick();
-    return schedule(frame->esp, READY);
+    schedule(READY);
 }
 
 /**

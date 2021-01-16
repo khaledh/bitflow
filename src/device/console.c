@@ -7,7 +7,7 @@
 #include "../lib/util.h"
 #include "console.h"
 #include "../kernel/task.h"
-#include "../lib/queue.h"
+#include "../lib/blocking_queue.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25
@@ -126,6 +126,6 @@ void set_active_task(task_t* task) {
 
 void handle_key_event(char ch) {
     if (active_task) {
-        enqueue(active_task->keybuf, ch);
+        bq_enqueue(active_task->keybuf, ch);
     }
 }

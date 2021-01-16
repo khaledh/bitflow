@@ -82,9 +82,9 @@ task_t* create_task(void (*entry_point)()) {
     push(stack, 0x10);                  // gs
 
     t->esp = (uint32_t)stack;
-    t->state = READY;
+    t->state = NEW;
     t->id = n_tasks++;
-    t->keybuf = create_queue();
+    t->keybuf = create_blocking_queue();
 
     add_task(t);
 
@@ -93,6 +93,14 @@ task_t* create_task(void (*entry_point)()) {
 
 task_t* get_current_task() {
     return current_task;
+}
+
+task_t* get_task(uint32_t tid) {
+    return &tasks[tid];
+}
+
+void set_task_state(uint32_t tid, task_state_t state) {
+    tasks[tid].state = state;
 }
 
 void tasking_init() {
