@@ -33,6 +33,7 @@ KERNEL_LDFLAGS := $(LDFLAGS) --entry=kmain # --print-map
 
 KERNEL_SRCS = \
 	$(SRCDIR)/arch_x86/cpu.c \
+	$(SRCDIR)/arch_x86/gdt.c \
 	$(SRCDIR)/arch_x86/idt.c \
 	$(SRCDIR)/arch_x86/port.c \
 	$(SRCDIR)/device/ata.c \

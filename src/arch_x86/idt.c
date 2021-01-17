@@ -33,7 +33,7 @@ void idt_init() {
 
     // load IDT descriptor into CPU
     asm("lidt %0" : : "m"(idt_desc));
-};
+}
 
 void idt_set(uint8_t vector, isr_t handler) {
     idt[vector].segment_sel = 0x08; // code segment

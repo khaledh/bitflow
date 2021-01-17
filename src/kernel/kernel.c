@@ -3,6 +3,7 @@
  */
 
 #include "../arch_x86/cpu.h"
+#include "../arch_x86/gdt.h"
 #include "../arch_x86/idt.h"
 #include "../device/console.h"
 #include "../device/keyboard.h"
@@ -20,6 +21,7 @@ void kmain() {
 
     print("Booting kernel...\n");
 
+    gdt_init();
     idt_init();
     exceptions_init();
     pic_init();
