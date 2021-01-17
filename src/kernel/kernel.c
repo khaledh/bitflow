@@ -2,16 +2,16 @@
  * Kernel entry point and initialization
  */
 
-#include "../arch_x86/cpu.h"
-#include "../arch_x86/gdt.h"
-#include "../arch_x86/idt.h"
-#include "../device/console.h"
-#include "../device/keyboard.h"
-#include "../device/pic.h"
-#include "../device/pit.h"
+#include "arch_x86/cpu.h"
+#include "arch_x86/gdt.h"
+#include "arch_x86/idt.h"
+#include "device/console.h"
+#include "device/keyboard.h"
+#include "device/pic.h"
+#include "device/pit.h"
 #include "../shell/shell.h"
-#include "exceptions.h"
-#include "task.h"
+#include "kernel/exceptions.h"
+#include "kernel/task.h"
 
 void thread(int tid);
 

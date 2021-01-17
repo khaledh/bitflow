@@ -58,7 +58,7 @@ Let's `typedef` the kernel vector type as a function pointer. Let's also define 
 
 typedef void (*kernel_vector_t)(void);
 
-#define KVECT_PUT_STR 0
+#define VEC_PUT_STR 0
 ```
 
 Now let's create the actual vector table, which will contain only one vector for now. I'm using the [designated initializer](https://gcc.gnu.org/onlinedocs/gcc/Designated-Inits.html) feature to be explicit about which index maps to which function address.
@@ -70,7 +70,7 @@ Now let's create the actual vector table, which will contain only one vector for
 #include "console.h"
 
 kernel_vector_t kernel_vectors[] = {
-    [KVECT_PUT_STR] = (kernel_vector_t)put_str
+    [VEC_PUT_STR] = (kernel_vector_t)put_str
 };
 ```
 
@@ -109,7 +109,7 @@ Finally, let's modify the task itself to accept this new kernel vector table as 
 typedef void (*put_str_t)(const char*, char, int, int);
 
 void entry(kernel_vector_t kvectors[]) {
-    put_str_t kput_str = (put_str_t)kvectors[KVECT_PUT_STR];
+    put_str_t kput_str = (put_str_t)kvectors[VEC_PUT_STR];
     kput_str("Task A", WHITE_ON_BLUE, 1, 0);
 }
 ```

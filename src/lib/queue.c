@@ -1,5 +1,5 @@
-#include "queue.h"
-#include "../device/console.h"
+#include "lib/queue.h"
+#include "device/console.h"
 
 #define next(pos) ((pos + 1) % QUEUE_MAX_ITEMS)
 

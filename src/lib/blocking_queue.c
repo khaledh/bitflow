@@ -1,6 +1,6 @@
-#include "../kernel/event.h"
-#include "queue.h"
-#include "blocking_queue.h"
+#include "kernel/event.h"
+#include "lib/queue.h"
+#include "lib/blocking_queue.h"
 
 #define next(pos) ((pos + 1) % MAX_ITEMS)
 

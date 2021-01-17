@@ -5,7 +5,9 @@ GCC := i686-elf-gcc
 LD := i686-elf-ld
 QEMU := qemu-system-i386
 
-CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP -mgeneral-regs-only
+INCLUDE_DIR=src/include
+
+CFLAGS := -g -fno-asynchronous-unwind-tables -ffreestanding -masm=intel -MMD -MP -mgeneral-regs-only -I$(INCLUDE_DIR)
 LDFLAGS := --oformat=binary
 
 SRCDIR := src
@@ -45,11 +47,11 @@ KERNEL_SRCS = \
 	$(SRCDIR)/kernel/event.c \
 	$(SRCDIR)/kernel/exceptions.c \
 	$(SRCDIR)/kernel/interrupt.c \
-	$(SRCDIR)/kernel/kvector.c \
-	$(SRCDIR)/kernel/loader.c \
-	$(SRCDIR)/kernel/task.c \
 	$(SRCDIR)/kernel/kernel.c \
+	$(SRCDIR)/kernel/loader.c \
 	$(SRCDIR)/kernel/scheduler.c \
+	$(SRCDIR)/kernel/task.c \
+	$(SRCDIR)/kernel/vector.c \
 	$(SRCDIR)/lib/blocking_queue.c \
 	$(SRCDIR)/lib/queue.c \
 	$(SRCDIR)/lib/util.c \

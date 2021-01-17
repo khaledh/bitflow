@@ -3,11 +3,11 @@
  */
 
 #include <stdint.h>
-#include "../arch_x86/port.h"
-#include "../lib/util.h"
-#include "console.h"
-#include "../kernel/task.h"
-#include "../lib/blocking_queue.h"
+#include "arch_x86/port.h"
+#include "lib/util.h"
+#include "device/console.h"
+#include "kernel/task.h"
+#include "lib/blocking_queue.h"
 
 #define VIDEO_MEMORY_ADDR 0xB8000
 #define SCREEN_ROWS 25

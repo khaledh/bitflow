@@ -2,11 +2,11 @@
  * Task Management
  */
 
-#include "../arch_x86/cpu.h"
-#include "../device/console.h"
-#include "task.h"
-#include "../lib/queue.h"
-#include "../lib/util.h"
+#include "arch_x86/cpu.h"
+#include "device/console.h"
+#include "kernel/task.h"
+#include "lib/queue.h"
+#include "lib/util.h"
 
 #define STACK_SIZE 512
 

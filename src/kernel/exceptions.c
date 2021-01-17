@@ -2,10 +2,10 @@
  * CPU Exceptions
  */
 
-#include "../arch_x86/cpu.h"
-#include "../arch_x86/idt.h"
-#include "../device/console.h"
-#include "../lib/util.h"
+#include "arch_x86/cpu.h"
+#include "arch_x86/idt.h"
+#include "device/console.h"
+#include "lib/util.h"
 
 char* exception_msgs[] = {
     [0] = "[#DE] Divide Error",

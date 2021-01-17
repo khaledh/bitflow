@@ -2,7 +2,7 @@
  * Interrupt Descriptor Table (IDT)
  */
 
-#include "idt.h"
+#include "arch_x86/idt.h"
 
 #define TASK_GATE         0b00101
 #define INTERRUPT_GATE_32 0b01110

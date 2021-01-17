@@ -3,7 +3,7 @@
  */
 
 #include <stdint.h>
-#include "gdt.h"
+#include "arch_x86/gdt.h"
 
 typedef union {
     struct {
@@ -50,7 +50,7 @@ typedef union {
     };
 } seg_desc_t;
 
-static seg_desc_t gdt[3];
+static seg_desc_t gdt[16];
 
 static struct __attribute__((packed)) {
     uint16_t limit;

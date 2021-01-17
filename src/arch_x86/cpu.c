@@ -2,7 +2,7 @@
  * CPU
  */
 
-#include "cpu.h"
+#include "arch_x86/cpu.h"
 
 void idle() {
     while(1) {

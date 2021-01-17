@@ -3,10 +3,10 @@
  */
 
 #include <stdint.h>
-#include "../arch_x86/port.h"
-#include "../kernel/interrupt.h"
-#include "keyboard.h"
-#include "pic.h"
+#include "arch_x86/port.h"
+#include "kernel/interrupt.h"
+#include "device/keyboard.h"
+#include "device/pic.h"
 
 #define KEYBOARD_DATA   0x60
 #define KEYBOARD_STATUS 0x64

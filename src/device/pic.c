@@ -3,10 +3,10 @@
  */
 
 #include <stdint.h>
-#include "../arch_x86/idt.h"
-#include "../arch_x86/port.h"
-#include "pic.h"
-#include "console.h"
+#include "arch_x86/idt.h"
+#include "arch_x86/port.h"
+#include "device/pic.h"
+#include "device/console.h"
 
 #define IRQ_BASE_VECTOR 0x20
 

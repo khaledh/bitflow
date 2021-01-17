@@ -4,7 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "../arch_x86/port.h"
+#include "arch_x86/port.h"
 
 #define ATA0_BASE         0x1F0
 

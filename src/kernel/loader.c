@@ -4,10 +4,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "../device/ata.h"
-#include "kvector.h"
-#include "loader.h"
-#include "../lib/util.h"
+#include "device/ata.h"
+#include "kernel/vector.h"
+#include "kernel/loader.h"
+#include "lib/util.h"
 
 #define TASK_LOAD_ADDR 0xf000
 

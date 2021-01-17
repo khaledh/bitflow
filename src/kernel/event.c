@@ -1,6 +1,6 @@
-#include "event.h"
-#include "task.h"
-#include "scheduler.h"
+#include "kernel/event.h"
+#include "kernel/task.h"
+#include "kernel/scheduler.h"
 
 
 static event_t events[16];

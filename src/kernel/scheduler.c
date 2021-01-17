@@ -2,8 +2,8 @@
  * Task Scheduler
  */
 
-#include "../device/console.h"
-#include "scheduler.h"
+#include "device/console.h"
+#include "kernel/scheduler.h"
 
 extern task_t* current_task;
 extern void switch_to_task(task_t*);

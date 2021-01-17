@@ -3,10 +3,10 @@
  */
 
 #include <stdint.h>
-#include "console.h"
-#include "kbd.h"
-#include "../lib/queue.h"
-#include "../kernel/task.h"
+#include "device/console.h"
+#include "device/kbd.h"
+#include "lib/queue.h"
+#include "kernel/task.h"
 
 char read_char() {
     char ch = bq_dequeue(get_current_task()->keybuf);

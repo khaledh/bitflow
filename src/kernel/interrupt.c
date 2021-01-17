@@ -1,5 +1,5 @@
-#include "../device/pic.h"
-#include "exceptions.h"
+#include "device/pic.h"
+#include "kernel/exceptions.h"
 
 
 void isr_handler(interrupt_frame_t frame) {

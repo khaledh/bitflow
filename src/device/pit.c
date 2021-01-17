@@ -2,13 +2,13 @@
  * Programmable Interval Timer (PIT)
  */
 
-#include "../arch_x86/port.h"
-#include "../kernel/interrupt.h"
-#include "../kernel/scheduler.h"
-#include "../lib/util.h"
-#include "console.h"
-#include "pic.h"
-#include "pit.h"
+#include "arch_x86/port.h"
+#include "kernel/interrupt.h"
+#include "kernel/scheduler.h"
+#include "lib/util.h"
+#include "device/console.h"
+#include "device/pic.h"
+#include "device/pit.h"
 
 #define PIT_FREQUENCY 1193180
 #define PIT_CH0_DATA  0x40

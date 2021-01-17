@@ -4,9 +4,9 @@
 
 #include <stddef.h>
 #include "shell.h"
-#include "../device/console.h"
-#include "../kernel/loader.h"
-#include "../lib/util.h"
+#include "device/console.h"
+#include "kernel/loader.h"
+#include "lib/util.h"
 
 static int shell_no = 0;
 static char colors[] = {
