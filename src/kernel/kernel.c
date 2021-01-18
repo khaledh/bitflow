@@ -9,9 +9,9 @@
 #include "device/keyboard.h"
 #include "device/pic.h"
 #include "device/pit.h"
-#include "../shell/shell.h"
 #include "kernel/exceptions.h"
 #include "kernel/task.h"
+#include "../shell/shell.h"
 
 void thread(int tid);
 
@@ -28,7 +28,6 @@ void kmain() {
     pit_init();
     keyboard_init(handle_key_event);
     tasking_init();
-
 
 //    create_task(thread);
 //    create_task(thread);
@@ -48,7 +47,7 @@ void kmain() {
 }
 
 void thread(int tid) {
-    for (int row = (tid * 3); row < (tid * 3 + 2); row++) {
+    for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
         for (int col = 0; col < 80; col++) {
             put_char('.', (BLACK << 4 | tid), row, col);
             for (int i=0; i<250000; i++);

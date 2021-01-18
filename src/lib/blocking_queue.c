@@ -2,8 +2,6 @@
 #include "lib/queue.h"
 #include "lib/blocking_queue.h"
 
-#define next(pos) ((pos + 1) % MAX_ITEMS)
-
 static blocking_queue_t queues[16];
 static int n_queues = 0;
 

@@ -4,6 +4,7 @@
 
 #include "arch_x86/cpu.h"
 
+_Noreturn
 void idle() {
     while(1) {
         asm("hlt");
@@ -12,6 +13,8 @@ void idle() {
 
 _Noreturn
 void halt() {
-    asm("cli \n"
-        "hlt");
+    while(1) {
+        asm("cli \n"
+            "hlt");
+    }
 }
