@@ -39,6 +39,7 @@ KERNEL_SRCS = \
 	$(SRCDIR)/arch_x86/idt.c \
 	$(SRCDIR)/arch_x86/port.c \
 	$(SRCDIR)/device/ata.c \
+	$(SRCDIR)/device/bga.c \
 	$(SRCDIR)/device/console.c \
 	$(SRCDIR)/device/kbd.c \
 	$(SRCDIR)/device/keyboard.c \

@@ -5,6 +5,7 @@
 #include "arch_x86/cpu.h"
 #include "arch_x86/gdt.h"
 #include "arch_x86/idt.h"
+#include "device/bga.h"
 #include "device/console.h"
 #include "device/keyboard.h"
 #include "device/pic.h"
@@ -29,6 +30,8 @@ void kmain() {
     keyboard_init(handle_key_event);
     tasking_init();
 
+    bga_init();
+
 //    create_task(thread);
 //    create_task(thread);
 //    create_task(thread);
@@ -37,9 +40,9 @@ void kmain() {
 //    create_task(thread);
 //    create_task(thread);
 
-    task_t* shell1 = create_task(shell);
-    task_t* shell2 = create_task(shell);
-    set_active_task(shell1);
+//    task_t* shell1 = create_task(shell);
+//    task_t* shell2 = create_task(shell);
+//    set_active_task(shell1);
 
     asm("sti");
 
