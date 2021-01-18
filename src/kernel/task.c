@@ -4,6 +4,7 @@
 
 #include "arch_x86/cpu.h"
 #include "device/console.h"
+#include "kernel/scheduler.h"
 #include "kernel/task.h"
 #include "lib/queue.h"
 #include "lib/util.h"
@@ -53,15 +54,15 @@ void end_task() {
 //        current_task = current_task->next;
 //    }
 //    del_task(t);
-    current_task->state = TERMINATED;
-    idle();
+
+    schedule(TERMINATED);
 }
 
 task_t* create_task(void (*entry_point)()) {
     task_t* t = &tasks[n_tasks];
     uint32_t* stack = &stacks[n_tasks - 1][STACK_SIZE];
 
-    push(stack, n_tasks);           // task id
+    push(stack, n_tasks);               // task id (param to entry_point)
     push(stack, (uint32_t)end_task);    // eip
     push(stack, 0x202);                 // eflags
     push(stack, 0x08);                  // cs
