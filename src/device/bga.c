@@ -70,13 +70,23 @@ void set_video_mode(uint16_t width, uint16_t height, uint16_t bpp) {
     write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
 }
 
-void bga_init() {
-    set_video_mode(1024, 768, 32);
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 768
 
+
+void fill_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t colour) {
     uint32_t* fb = (uint32_t*)VBE_DISPI_LFB_PHYSICAL_ADDRESS;
 
-    // draw a diagonal line
-    for (int i=0; i<1024; i++) {
-        *(fb+i + 1024*i) = 0x00ff0000;
+    for (int j = y; j < (y + height); j++) {
+        for (int i = x; i < (x + width); i++) {
+            *(fb + SCREEN_WIDTH * j + i) = colour;
+        }
     }
+}
+
+void bga_init() {
+    set_video_mode(SCREEN_WIDTH, SCREEN_HEIGHT, 32);
+
+    fill_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0x002B508C);
+
 }

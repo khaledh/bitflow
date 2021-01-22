@@ -89,6 +89,11 @@ $(BLDDIR)/os.img: $(BLDDIR)/bootsect.bin $(BLDDIR)/kernel.bin $(BLDDIR)/task_a.b
 	cat $^ > $@
 
 ##
+# Tools
+$(BLDDIR)/tools/parse_fon: tools/parse_fon.c
+	gcc $< -o $@
+
+##
 # other targets
 #
 .PHONY: all run clean
@@ -106,5 +111,10 @@ clean:
 		$(BLDDIR)/tasks/task_*.d \
 		$(BLDDIR)/*.bin \
 		$(BLDDIR)/os.img
+
+tools: $(BLDDIR)/tools/parse_fon
+
+$(shell mkdir -p $(BLDDIR)/tools >/dev/null)
+
 
 -include $(deps)
