@@ -70,13 +70,20 @@ void set_video_mode(uint16_t width, uint16_t height, uint16_t bpp) {
     write_register(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_ENABLED | VBE_DISPI_LFB_ENABLED);
 }
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
+static uint32_t* fb = (uint32_t*)VBE_DISPI_LFB_PHYSICAL_ADDRESS;
 
+void bga_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t colour) {
+    for (int i = x; i < (x + width); i++) {
+        *(fb + SCREEN_WIDTH * y + i) = colour;
+        *(fb + SCREEN_WIDTH * (y + height) + i) = colour;
+    }
+    for (int j = y; j < (y + height); j++) {
+        *(fb + SCREEN_WIDTH * j + x) = colour;
+        *(fb + SCREEN_WIDTH * j + (x + width)) = colour;
+    }
+}
 
-void fill_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t colour) {
-    uint32_t* fb = (uint32_t*)VBE_DISPI_LFB_PHYSICAL_ADDRESS;
-
+void bga_rect_fill(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t colour) {
     for (int j = y; j < (y + height); j++) {
         for (int i = x; i < (x + width); i++) {
             *(fb + SCREEN_WIDTH * j + i) = colour;
@@ -84,9 +91,20 @@ void fill_rect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t
     }
 }
 
-void bga_init() {
+void bga_copy(uint8_t mask[], uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t colour) {
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            if (mask[j] & ((uint8_t )1 << (7 - i))) {
+                *(fb + SCREEN_WIDTH * (j + y) + (i + x)) = colour;
+//                *(fb + SCREEN_WIDTH * (j*2 + y) + (i*2 + x)) = colour;
+//                *(fb + SCREEN_WIDTH * (j*2 + y + 1) + (i*2 + x)) = colour;
+//                *(fb + SCREEN_WIDTH * (j*2 + y) + (i*2 + x + 1)) = colour;
+//                *(fb + SCREEN_WIDTH * (j*2 + y + 1) + (i*2 + x + 1)) = colour;
+            }
+        }
+    }
+}
+
+void bga_set_graphics_mode() {
     set_video_mode(SCREEN_WIDTH, SCREEN_HEIGHT, 32);
-
-    fill_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0x002B508C);
-
 }

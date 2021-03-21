@@ -3,7 +3,7 @@
 NASM := nasm
 GCC := i686-elf-gcc
 LD := i686-elf-ld
-QEMU := qemu-system-i386
+QEMU := "/mnt/c/Program Files/qemu/qemu-system-i386.exe"
 
 INCLUDE_DIR=src/include
 
@@ -55,6 +55,8 @@ KERNEL_SRCS = \
 	$(SRCDIR)/kernel/vector.c \
 	$(SRCDIR)/lib/blocking_queue.c \
 	$(SRCDIR)/lib/queue.c \
+	$(SRCDIR)/gui/font.c \
+	$(SRCDIR)/gui/gui.c \
 	$(SRCDIR)/lib/util.c \
 	$(SRCDIR)/shell/shell.c
 
@@ -85,7 +87,12 @@ $(shell mkdir -p $(BLDDIR)/tasks >/dev/null)
 ##
 # OS image
 
-$(BLDDIR)/os.img: $(BLDDIR)/bootsect.bin $(BLDDIR)/kernel.bin $(BLDDIR)/task_a.bin $(BLDDIR)/task_b.bin
+$(BLDDIR)/os.img: \
+	$(BLDDIR)/bootsect.bin \
+	$(BLDDIR)/kernel.bin \
+	$(BLDDIR)/task_a.bin \
+	$(BLDDIR)/task_b.bin \
+	$(SRCDIR)/gui/screen7x14.fon
 	cat $^ > $@
 
 ##

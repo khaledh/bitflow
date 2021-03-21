@@ -10,6 +10,8 @@
 #include "device/keyboard.h"
 #include "device/pic.h"
 #include "device/pit.h"
+#include <gui/font.h>
+#include <gui/gui.h>
 #include "kernel/exceptions.h"
 #include "kernel/task.h"
 #include "../shell/shell.h"
@@ -30,7 +32,7 @@ void kmain() {
     keyboard_init(handle_key_event);
     tasking_init();
 
-    bga_init();
+//    gui_init();
 
 //    create_task(thread);
 //    create_task(thread);
@@ -40,9 +42,9 @@ void kmain() {
 //    create_task(thread);
 //    create_task(thread);
 
-//    task_t* shell1 = create_task(shell);
+    task_t* shell1 = create_task(shell);
 //    task_t* shell2 = create_task(shell);
-//    set_active_task(shell1);
+    set_active_task(shell1);
 
     asm("sti");
 
