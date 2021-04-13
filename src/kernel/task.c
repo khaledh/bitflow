@@ -98,8 +98,10 @@ task_t* create_user_task(void (*entry_point)()) {
 
     push(stack, n_tasks);               // task id (param to entry_point)
     push(stack, (uint32_t)end_task);    // eip
+
+    uint32_t* esp = stack;
     push(stack, 0x20 | 3);              // ss
-    push(stack, 0);                     // esp
+    push(stack, (uint32_t)esp);         // esp
     push(stack, 0x202);                 // eflags
     push(stack, 0x18 | 3);              // cs
     push(stack, (uint32_t)entry_point); // eip
@@ -113,10 +115,10 @@ task_t* create_user_task(void (*entry_point)()) {
     push(stack, 0);                     // ebp
     push(stack, 0);                     // esi
     push(stack, 0);                     // edi
-    push(stack, 0x20 | 3);                  // ds
-    push(stack, 0x20 | 3);                  // es
-    push(stack, 0x20 | 3);                  // fs
-    push(stack, 0x20 | 3);                  // gs
+    push(stack, 0x20 | 3);              // ds
+    push(stack, 0x20 | 3);              // es
+    push(stack, 0x20 | 3);              // fs
+    push(stack, 0x20 | 3);              // gs
 
     t->esp = (uint32_t)stack;
     t->state = NEW;

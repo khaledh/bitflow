@@ -16,7 +16,7 @@
 #include "kernel/task.h"
 #include "../shell/shell.h"
 
-void thread(int tid);
+_Noreturn void thread(int tid);
 
 void kmain() {
     disable_cursor();
@@ -35,8 +35,9 @@ void kmain() {
 //    gui_init();
 
     create_user_task(thread);
-//    create_task(thread);
-//    create_task(thread);
+//    create_user_task(thread);
+//    for (int i=0; i<250000000; i++);
+//    create_user_task(thread);
 //    create_task(thread);
 //    create_task(thread);
 //    create_task(thread);
@@ -51,11 +52,13 @@ void kmain() {
     idle();
 }
 
+_Noreturn
 void thread(int tid) {
     for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
         for (int col = 0; col < 80; col++) {
-            put_char('.', (BLACK << 4 | tid), row, col);
+            put_char('.', (BLACK << 4 | tid + 1), row, col);
             for (int i=0; i<250000; i++);
         }
     }
+    for(;;);
 }
