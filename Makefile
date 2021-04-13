@@ -92,7 +92,7 @@ $(BLDDIR)/os.img: \
 	$(BLDDIR)/kernel.bin \
 	$(BLDDIR)/task_a.bin \
 	$(BLDDIR)/task_b.bin \
-	$(SRCDIR)/gui/screen7x14.fon
+	resources/fonts/screen7x14.fon
 	cat $^ > $@
 
 ##

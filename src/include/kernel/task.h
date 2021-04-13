@@ -21,6 +21,7 @@ typedef struct task {
 
 void tasking_init();
 task_t* create_task(void (entry_point)());
+task_t* create_user_task(void (entry_point)());
 task_t* get_current_task();
 task_t* get_task(uint32_t tid);
 void set_task_state(uint32_t tid, task_state_t state);

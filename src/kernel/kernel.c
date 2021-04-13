@@ -34,7 +34,7 @@ void kmain() {
 
 //    gui_init();
 
-//    create_task(thread);
+    create_user_task(thread);
 //    create_task(thread);
 //    create_task(thread);
 //    create_task(thread);
