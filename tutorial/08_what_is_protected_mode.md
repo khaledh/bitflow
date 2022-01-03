@@ -10,7 +10,7 @@ We're still in 16-bit real mode, which has the following limitations/issues:
 
 ### 16-bit Protected Mode
 
-In addition to supporting rael mode for backward compatibility, the x86 supports another mode called **Protected Mode** that solves all those problems. Protected mode was first introduced in the 16-bit 286, which used 24-bit physical address space (i.e. max 16MB of memory) and 16-bit segment sizes (i.e. max 64K). Although it achives protection, this is still a restricted environment. In addition to the small amount of addressable memory and small segment size, currently there are no mainstream 286 emulators or 16-bit C compilers[^1]. We  will have to move to 32-bit to leverage the available emulators and modern compilers such as GCC or Clang.
+In addition to supporting real mode for backward compatibility, the x86 supports another mode called **Protected Mode** that solves all those problems. Protected mode was first introduced in the 16-bit 286, which used 24-bit physical address space (i.e. max 16MB of memory) and 16-bit segment sizes (i.e. max 64K). Although it achives protection, this is still a restricted environment. In addition to the small amount of addressable memory and small segment size, currently there are no mainstream 286 emulators or 16-bit C compilers[^1]. We  will have to move to 32-bit to leverage the available emulators and modern compilers such as GCC or Clang.
 
 [^1]: There are 16-bit DOS C compilers available (e.g. Turbo C or DJGPP), but they need a DOS environment to run in (e.g. DOSBox). This would complicate our workflow significantly and there's not much benefit from going through the trouble.
 
@@ -22,7 +22,7 @@ So switching to 32-bit protected mode unlocks a sufficiently large memory addres
 
 ### Privilege Levels
 
-In addition, each segment is assigned one of four privilege levels, unofficially called ring 0 to ring 3, where ring 0 is the highest privilege (for the kernel), and rings 1-3 are for less privileged code. Modern operating systems typically use two rings only: ring 0 for kernel mode, and ring 3 for user mode. The CPU enforces strict rules for controlled transfer between the different privilege levels. If you heard the term "syscall" before, this basically means that code running in ring 3 (i.e. user program) wants to invoke a routine in ring 3 (i.e. kernel). This is because user mode should not be able to call the kernel except through well-defined entry points (syscalls).
+In addition, each segment is assigned one of four privilege levels, unofficially called ring 0 to ring 3, where ring 0 is the highest privilege (for the kernel), and rings 1-3 are for less privileged code. Modern operating systems typically use two rings only: ring 0 for kernel mode, and ring 3 for user mode. The CPU enforces strict rules for controlled transfer between the different privilege levels. If you heard the term "syscall" before, this basically means that code running in ring 3 (i.e. user program) wants to invoke a routine in ring 0 (i.e. kernel). This is because user mode should not be able to call the kernel except through well-defined entry points (syscalls).
 
 ### Memory Segmenation
 
