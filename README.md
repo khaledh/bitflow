@@ -1,8 +1,3 @@
 # bitflow
 
-bitflow is an operating system designed for easy composition of software component.
-
-## Log
-
-2020-09-10
-
+bitflow is my attempt at creating a 32-bit kernel in C.
