@@ -85,6 +85,7 @@ task_t* create_task(void (*entry_point)()) {
     t->esp = (uint32_t)stack;
     t->state = NEW;
     t->id = n_tasks++;
+    t->privilege = 0;
     t->keybuf = create_blocking_queue();
 
     add_task(t);
@@ -96,8 +97,8 @@ task_t* create_user_task(void (*entry_point)()) {
     task_t* t = &tasks[n_tasks];
     uint32_t* stack = &stacks[n_tasks - 1][STACK_SIZE];
 
-    push(stack, n_tasks);               // task id (param to entry_point)
-    push(stack, (uint32_t)end_task);    // eip
+//    push(stack, n_tasks);               // task id (param to entry_point)
+//    push(stack, (uint32_t)end_task);    // eip
 
     uint32_t* esp = stack;
     push(stack, 0x20 | 3);              // ss
@@ -123,6 +124,7 @@ task_t* create_user_task(void (*entry_point)()) {
     t->esp = (uint32_t)stack;
     t->state = NEW;
     t->id = n_tasks++;
+    t->privilege = 3;
     t->keybuf = create_blocking_queue();
 
     add_task(t);

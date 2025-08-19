@@ -17,6 +17,8 @@
 #include "../shell/shell.h"
 
 _Noreturn void thread(int tid);
+_Noreturn void thread2();
+_Noreturn void thread3();
 
 void kmain() {
     disable_cursor();
@@ -35,6 +37,8 @@ void kmain() {
 //    gui_init();
 
     create_user_task(thread);
+    create_user_task(thread2);
+    create_user_task(thread3);
 //    create_user_task(thread);
 //    for (int i=0; i<250000000; i++);
 //    create_user_task(thread);
@@ -53,10 +57,38 @@ void kmain() {
 }
 
 _Noreturn
-void thread(int tid) {
+void thread(int _tid) {
+    int tid = 1;
     for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
         for (int col = 0; col < 80; col++) {
-            put_char('.', (BLACK << 4 | tid + 1), row, col);
+//            put_char('.', (BLACK << 4 | tid + 1), row, col);
+            put_char('.', (BLACK << 4 | YELLOW), row, col);
+            for (int i=0; i<250000; i++);
+        }
+    }
+    for(;;);
+}
+
+_Noreturn
+void thread2() {
+    int tid = 2;
+    for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
+        for (int col = 0; col < 80; col++) {
+//            put_char('.', (BLACK << 4 | tid + 1), row, col);
+            put_char('.', (BLACK << 4 | RED_LT), row, col);
+            for (int i=0; i<250000; i++);
+        }
+    }
+    for(;;);
+}
+
+_Noreturn
+void thread3() {
+    int tid = 3;
+    for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
+        for (int col = 0; col < 80; col++) {
+//            put_char('.', (BLACK << 4 | tid + 1), row, col);
+            put_char('.', (BLACK << 4 | CYAN_LT), row, col);
             for (int i=0; i<250000; i++);
         }
     }

@@ -23,10 +23,38 @@ switch_to_task:
     ; load next task's state
 
     mov     esi, [esp + (8+1)*4]             ; address of next task's struct
-    mov     esp, [esi + task_t.esp]          ; load new task's kernel stack esp
-
     mov     [current_task], esi              ; set current task struct
 
+    mov     esp, [esi + task_t.esp]          ; load new task's kernel stack esp
+
+    popa
+    ret                                      ; pop eip from the new task's kernel stack
+
+
+global switch_to_user_task
+switch_to_user_task:
+    pusha
+    push    ds
+    push    es
+    push    fs
+    push    gs
+
+    ; save current task's state
+
+    mov     edi, [current_task]              ; address of current task's struct
+    mov     [edi + task_t.esp], esp          ; save current task's stack esp
+
+    ; load next task's state
+
+    mov     esi, [esp + (8+1)*4]             ; address of next task's struct
+    mov     [current_task], esi              ; set current task struct
+
+    mov     esp, [esi + task_t.esp]          ; load new task's kernel stack esp
+
+    pop     gs
+    pop     fs
+    pop     es
+    pop     ds
     popa
     ret                                      ; pop eip from the new task's kernel stack
 

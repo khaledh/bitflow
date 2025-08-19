@@ -14,6 +14,7 @@ typedef enum task_state {
 typedef struct task {
     uint32_t esp;
     uint32_t id;
+    uint8_t privilege;
     task_state_t state;
     blocking_queue_t* keybuf;
     struct task* next;

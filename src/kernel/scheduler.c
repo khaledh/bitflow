@@ -8,6 +8,7 @@
 extern task_t* current_task;
 extern void switch_to_task(task_t*);
 extern void switch_to_new_task(task_t*);
+extern void switch_to_user_task(task_t*);
 
 void schedule(task_state_t state) {
     current_task->state = state;
@@ -25,13 +26,16 @@ void schedule(task_state_t state) {
 //    print_hex8(next_task->id);
 //    print_hex8(next_task->state);
 
+    next_task->state = RUNNING;
+
     if (next_task->state == NEW) {
 //        print("\nswitching to new task");
-        next_task->state = RUNNING;
         switch_to_new_task(next_task);
+    } else if (next_task->privilege == 3) {
+//        print("\nswitching to new task");
+            switch_to_user_task(next_task);
     } else {
 //        print("\nswitching to existing task");
-        next_task->state = RUNNING;
         switch_to_task(next_task);
     }
 }
