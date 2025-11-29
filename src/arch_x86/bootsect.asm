@@ -6,12 +6,15 @@
 [org 0x7C00]
 
     ;
-    ; load kernel
+    ; load kernel (starts at sector 2 in 0-based = sector 3 in BIOS 1-based)
+    ; Sector 0: boot sector
+    ; Sector 1: file table
+    ; Sector 2+: kernel
     ;
     mov    ah, 2                 ; INT 13,2 Read Disk Sectors
     mov    al, 128               ; read n sectors
     mov    ch, 0                 ; first track/cylinder
-    mov    cl, 2                 ; second sector (sector numbers are 1-based)
+    mov    cl, 3                 ; third sector (sector numbers are 1-based)
     mov    dh, 0                 ; first head
     mov    dl, 0x80              ; drive number, 80h=drive 0
     mov    bx, 0x7E00            ; es:bx = 0x0000:0x7E00 = 0x07E00

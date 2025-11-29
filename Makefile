@@ -86,9 +86,26 @@ $(shell mkdir -p $(BLDDIR)/tasks >/dev/null)
 
 ##
 # OS image
+#
+# Disk layout:
+#   Sector 0:   Boot sector (512 bytes)
+#   Sector 1:   File table (512 bytes) - generated at build time
+#   Sector 2+:  Kernel
+#   After kernel: Tasks, fonts, etc.
+
+# Calculate sector positions dynamically
+KERNEL_START_SECTOR := 2
+KERNEL_SECTORS = $$(( $$(stat -f%z $(BLDDIR)/kernel.bin) / 512 ))
+
+$(BLDDIR)/filetable.bin: $(BLDDIR)/tools/gen_filetable $(BLDDIR)/kernel.bin $(BLDDIR)/task_a.bin $(BLDDIR)/task_b.bin
+	@TASK_A_SECTOR=$$(( $(KERNEL_START_SECTOR) + $$(stat -f%z $(BLDDIR)/kernel.bin) / 512 )); \
+	TASK_B_SECTOR=$$(( $$TASK_A_SECTOR + 1 )); \
+	echo "Generating file table: task_a=$$TASK_A_SECTOR, task_b=$$TASK_B_SECTOR"; \
+	$(BLDDIR)/tools/gen_filetable $@ "task_a:$$TASK_A_SECTOR" "task_b:$$TASK_B_SECTOR"
 
 $(BLDDIR)/os.img: \
 	$(BLDDIR)/bootsect.bin \
+	$(BLDDIR)/filetable.bin \
 	$(BLDDIR)/kernel.bin \
 	$(BLDDIR)/task_a.bin \
 	$(BLDDIR)/task_b.bin \
@@ -98,6 +115,9 @@ $(BLDDIR)/os.img: \
 ##
 # Tools
 $(BLDDIR)/tools/parse_fon: tools/parse_fon.c
+	gcc $< -o $@
+
+$(BLDDIR)/tools/gen_filetable: tools/gen_filetable.c
 	gcc $< -o $@
 
 ##
@@ -129,7 +149,8 @@ clean:
 		$(BLDDIR)/tasks/task_*.o \
 		$(BLDDIR)/tasks/task_*.d \
 		$(BLDDIR)/*.bin \
-		$(BLDDIR)/os.img
+		$(BLDDIR)/os.img \
+		$(BLDDIR)/tools/gen_filetable
 
 tools: $(BLDDIR)/tools/parse_fon
 

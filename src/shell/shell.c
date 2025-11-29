@@ -29,6 +29,21 @@ void shell_read_line(char buf[], size_t size) {
     buf[i] = 0;
 }
 
+void print_help() {
+    print("Available commands:\n");
+    print("  help     - Show this help message\n");
+    print("  about    - Show system information\n");
+    print("  tasks    - List all tasks\n");
+    print("  task_a   - Run sample task A\n");
+    print("  task_b   - Run sample task B\n");
+    print("  quit     - Shutdown the system\n");
+}
+
+void print_about() {
+    print("Bitflow OS (c) 2020-2025 Khaled Hammouda\n");
+    print("Version 1.0\n");
+}
+
 void print_task_list() {
     task_t* tasks;
     int n_tasks = get_task_list(&tasks);
@@ -64,26 +79,37 @@ void print_task_list() {
     }
 }
 
-void shell(int task_id) {
-    char name[32];
+void dispatch_cmd(const char* cmd) {
+    if (strcmp(cmd, "help") == 0) {
+        print_help();
+    }
+    else if (strcmp(cmd, "about") == 0) {
+        print_about();
+    }
+    else if (strcmp(cmd, "tasks") == 0) {
+        print_task_list();
+    }
+    else {
+        if (exec(cmd) != 0) {
+            print("Unknown command. Type 'help' for available commands.\n");
+        }
+    }
+}
 
+void shell(int task_id) {
+    char cmd[32];
+
+    clear_screen();
+    print_about();
     print("\n> ");
-    shell_read_line(name, 32);
-    while (strcmp(name, "quit") != 0) {
-        int len = strlen(name);
-        if (len > 0) {
-            if (strcmp(name, "tasks") == 0) {
-                print_task_list();
-            }
-            else {
-                if (exec(name) != 0) {
-                    print("Task not found.");
-                }
-            }
+    shell_read_line(cmd, 32);
+    while (strcmp(cmd, "quit") != 0) {
+        if (strlen(cmd) > 0) {
+            dispatch_cmd(cmd);
             print("\n");
         }
         print("> ");
-        shell_read_line(name, 32);
+        shell_read_line(cmd, 32);
     }
 
     print("\nBye\n");
