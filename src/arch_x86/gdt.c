@@ -132,6 +132,10 @@ void gdt_init() {
     asm("lgdt %0" : : "m"(gdt_desc));
 
     // load TSS selector into Task Register
-    asm("mov ax, (5 * 8) | 3 \n" // fifth 8-byte selector. OR with 3 to set the RPL.\n"
+    asm("mov ax, (5 * 8) | 0 \n" // TSS selector with RPL 0
         "ltr ax");
+}
+
+void tss_set_kernel_stack(uint32_t esp0) {
+    tss.esp0 = esp0;
 }

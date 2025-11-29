@@ -4,19 +4,15 @@
 
 #include <stddef.h>
 #include "shell.h"
+#include "arch_x86/port.h"
 #include "device/console.h"
 #include "kernel/loader.h"
+#include "kernel/task.h"
 #include "lib/util.h"
-
-static int shell_no = 0;
-static char colors[] = {
-    (BLACK << 4 | YELLOW),
-    (BLACK << 4 | RED_LT),
-};
 
 char shell_read_char() {
     char ch = bq_dequeue(get_current_task()->keybuf);
-    write_char(ch, colors[shell_no]);
+    print_char(ch);
     return ch;
 }
 
@@ -33,8 +29,42 @@ void shell_read_line(char buf[], size_t size) {
     buf[i] = 0;
 }
 
+void print_task_list() {
+    task_t* tasks;
+    int n_tasks = get_task_list(&tasks);
+    for (int i = 0; i < n_tasks; i++) {
+        print_hex8(tasks[i].id);
+        print(" ");
+        if (tasks[i].privilege == 0) {
+            print("(K)");
+        } else {
+            print("(U)");
+        }
+        print(" ");
+        print(tasks[i].name);
+        print(" ");
+        switch (tasks[i].state) {
+            case NEW:
+                print("NEW");
+                break;
+            case READY:
+                print("READY");
+                break;
+            case RUNNING:
+                print("RUNNING");
+                break;
+            case BLOCKED:
+                print("BLOCKED");
+                break;
+            case TERMINATED:
+                print("TERMINATED");
+                break;
+        }
+        print("\n");
+    }
+}
 
-void shell(uint32_t task_id) {
+void shell(int task_id) {
     char name[32];
 
     print("\n> ");
@@ -42,13 +72,13 @@ void shell(uint32_t task_id) {
     while (strcmp(name, "quit") != 0) {
         int len = strlen(name);
         if (len > 0) {
-            if (strcmp(name, "switch") == 0) {
-                uint32_t tid = shell_no == 0 ? task_id + 1 : task_id - 1;
-                shell_no = (shell_no + 1) % 2;
-                set_active_task(get_task(tid));
+            if (strcmp(name, "tasks") == 0) {
+                print_task_list();
             }
-            else if (exec(name) != 0) {
-                print("Task not found.");
+            else {
+                if (exec(name) != 0) {
+                    print("Task not found.");
+                }
             }
             print("\n");
         }
@@ -56,5 +86,8 @@ void shell(uint32_t task_id) {
         shell_read_line(name, 32);
     }
 
-    print("\nBye");
+    print("\nBye\n");
+
+    // Shutdown QEMU (ACPI power off)
+    port_out16(0x604, 0x2000);
 }

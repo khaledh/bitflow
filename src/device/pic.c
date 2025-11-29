@@ -125,7 +125,7 @@ void handle_irq(interrupt_frame_t* frame) {
     uint32_t irq_no = frame->int_no - IRQ_BASE_VECTOR;
 
     // ack interrupt
-    irq_eoi(frame->int_no);
+    irq_eoi(irq_no);
 
     if (irq_no >= 16) {
         return;

@@ -5,6 +5,7 @@
 #include "arch_x86/cpu.h"
 #include "arch_x86/gdt.h"
 #include "arch_x86/idt.h"
+#include "arch_x86/task_switch.h"
 #include "device/bga.h"
 #include "device/console.h"
 #include "device/keyboard.h"
@@ -16,9 +17,11 @@
 #include "kernel/task.h"
 #include "../shell/shell.h"
 
-_Noreturn void thread(int tid);
-_Noreturn void thread2();
-_Noreturn void thread3();
+extern task_t* current_task;
+
+_Noreturn void thread(int _tid);
+_Noreturn void thread2(int _tid);
+_Noreturn void thread3(int _tid);
 
 void kmain() {
     disable_cursor();
@@ -32,28 +35,22 @@ void kmain() {
     pic_init();
     pit_init();
     keyboard_init(handle_key_event);
-    tasking_init();
 
-//    gui_init();
+    //  gui_init();
 
-    create_user_task(thread);
-    create_user_task(thread2);
-    create_user_task(thread3);
-//    create_user_task(thread);
-//    for (int i=0; i<250000000; i++);
-//    create_user_task(thread);
-//    create_task(thread);
-//    create_task(thread);
-//    create_task(thread);
-//    create_task(thread);
+    task_t* idle_task = create_task("idle", idle);
+    task_t* shell_task = create_task("shell", shell);
+    create_user_task("dots1",thread);
+    create_user_task("dots2",thread2);
+    create_user_task("dots3",thread3);
 
-    task_t* shell1 = create_task(shell);
-//    task_t* shell2 = create_task(shell);
-    set_active_task(shell1);
+    set_active_task(shell_task);
 
-    asm("sti");
-
-    idle();
+    // Start executing the idle task as task 0; this never returns.
+    current_task = idle_task;
+    tss_set_kernel_stack(idle_task->kstack);
+    current_task->state = RUNNING;
+    resume_new_task(current_task);
 }
 
 _Noreturn
@@ -70,7 +67,7 @@ void thread(int _tid) {
 }
 
 _Noreturn
-void thread2() {
+void thread2(int _tid) {
     int tid = 2;
     for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
         for (int col = 0; col < 80; col++) {
@@ -83,7 +80,7 @@ void thread2() {
 }
 
 _Noreturn
-void thread3() {
+void thread3(int _tid) {
     int tid = 3;
     for (int row = (tid * 3); row < (tid * 3 + 3); row++) {
         for (int col = 0; col < 80; col++) {

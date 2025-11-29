@@ -26,9 +26,15 @@ void reset_event(event_t* evt) {
 }
 
 void wait_event(event_t* evt) {
-    if (evt->state == 1) {
-        return;
+    // Block the current task until the event is set.
+    // We avoid invoking the scheduler directly from kernel mode;
+    // instead we mark the task BLOCKED and yield the CPU with HLT,
+    // letting the timer interrupt drive scheduling.
+    while (evt->state == 0) {
+        evt->tid = get_current_task()->id;
+        set_task_state(evt->tid, BLOCKED);
+
+        // Enable interrupts and halt until the next interrupt.
+        asm volatile("sti\nhlt");
     }
-    evt->tid = get_current_task()->id;
-    schedule(BLOCKED);
 }

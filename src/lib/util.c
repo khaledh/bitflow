@@ -3,6 +3,7 @@
  */
 
 #include <stdint.h>
+#include <stddef.h>
 
 const char hex_digits[] = "0123456789abcdef";
 
@@ -36,4 +37,14 @@ int strlen(const char* str) {
     const char* p = str;
     while (*p++);
     return p - str - 1;
+}
+
+void strncpy(char* dest, const char* src, size_t n) {
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    if (i < n) {
+        dest[i] = '\0';
+    }
 }

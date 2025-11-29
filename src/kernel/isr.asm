@@ -267,6 +267,12 @@ isr47:
 ; Common stub
 ; -----------------------------------------------------------------------------
 
+extern current_task
+
+struc task_t
+    .esp    resd 1
+endstruc
+
 isr_common:
     pusha
     push    ds
@@ -275,16 +281,24 @@ isr_common:
     push    gs
 
     ; load kernel's segment selectors
-
     mov     eax, 0x10
     mov     ds, eax
     mov     es, eax
     mov     fs, eax
     mov     gs, eax
 
+    ; Save current task's kernel stack pointer (pointing at the full interrupt frame)
+    mov     edi, [current_task]
+    mov     [edi + task_t.esp], esp
+
     mov     [esp + 28], esp         ; store current esp in its position in stack (as pushed by `pusha` above)
     call    isr_handler
 
+    ; Restore (possibly different) current task's kernel stack pointer
+    mov     edi, [current_task]
+    mov     esp, [edi + task_t.esp]
+
+isr_return:
     pop     gs
     pop     fs
     pop     es

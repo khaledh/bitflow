@@ -1,4 +1,4 @@
 #pragma once
 
-_Noreturn void idle();
+_Noreturn void idle(int _tid);
 _Noreturn void halt();

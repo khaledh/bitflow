@@ -3,7 +3,7 @@
 NASM := nasm
 GCC := i686-elf-gcc
 LD := i686-elf-ld
-QEMU := "/mnt/c/Program Files/qemu/qemu-system-i386.exe"
+QEMU := "qemu-system-i386"
 
 INCLUDE_DIR=src/include
 
@@ -108,7 +108,19 @@ $(BLDDIR)/tools/parse_fon: tools/parse_fon.c
 all: $(BLDDIR)/os.img
 
 run: $(BLDDIR)/os.img
-	$(QEMU) -nic none -drive file=$<,format=raw -monitor stdio -no-shutdown -no-reboot # -d int
+	$(QEMU) \
+        -nic none \
+        -drive file=$<,format=raw \
+        -display curses \
+        -no-shutdown \
+        -no-reboot # -d int
+
+run-window: $(BLDDIR)/os.img
+	$(QEMU) \
+        -nic none \
+        -drive file=$<,format=raw \
+        -no-reboot & \
+	osascript -e 'tell application "System Events" to set frontmost of (first process whose name contains "qemu") to true'
 
 clean:
 	$(RM) \

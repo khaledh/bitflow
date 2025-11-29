@@ -11,16 +11,13 @@
 
 #define STACK_SIZE 512
 
-//task_t t0, t1, t2;
-//task_t* current_task = &t0;
-//task_t* thread_list = &t0;
-
 uint32_t n_tasks = 0;
 
 task_t tasks[16];
-task_t* current_task = &tasks[0];
+task_t* current_task = NULL;
 
-uint32_t stacks[8][STACK_SIZE];
+uint32_t kstacks[8][STACK_SIZE];
+uint32_t ustacks[8][STACK_SIZE];
 
 
 void add_task(task_t* t) {
@@ -33,99 +30,132 @@ void add_task(task_t* t) {
 //    curr->next = t;
 //    t->next = next;
 
+  //  print("Adding task ");
+  //  print_hex8(t->id);
+  //  print(": tasks[");
+  //  print_hex8(t->id - 1);
+  //  print("].next = task ");
+  //  print_hex8(t->id);
+  //  print("\n");
+
+  if (t->id > 0) {
     tasks[t->id - 1].next = t;
-    tasks[t->id].next = &tasks[0];
+    t->next = &tasks[0];
+  } else {
+    t->next = t;
+  }
+
+//    print("Task 0 next: ");
+//    print_hex8(tasks[0].next->id);
+//    print("\n");
 }
 
-//void del_task(task_t* t) {
-//    task_t* prev = thread_list;
-//    task_t* curr = prev->next;
-//    while (curr != t && prev->next != thread_list) {
-//        prev = prev->next;
-//        curr = prev->next;
-//    }
-//    if (prev == t) {
-//        prev->next = curr->next;
-//    }
-//}
+// Remove a task from the circular linked list
+static void remove_task(task_t* t) {
+    // Find the task that points to t
+    task_t* prev = t;
+    while (prev->next != t) {
+        prev = prev->next;
+    }
+    // Unlink t from the list
+    prev->next = t->next;
+    t->next = NULL;
+}
 
 void end_task() {
-//    if (current_task == t) {
-//        current_task = current_task->next;
-//    }
-//    del_task(t);
+    task_t* t = get_current_task();
 
-    schedule(TERMINATED);
+    // Mark this task as terminated and remove from scheduler list
+    t->state = TERMINATED;
+    remove_task(t);
+
+    // Yield the CPU forever; the scheduler (called from timer interrupt)
+    // will switch to another task.
+    for (;;) {
+        asm volatile("sti\nhlt");
+    }
 }
 
-task_t* create_task(void (*entry_point)()) {
-    task_t* t = &tasks[n_tasks];
-    uint32_t* stack = &stacks[n_tasks - 1][STACK_SIZE];
+task_t* create_task(const char* name, void (*entry_point)(int)) {
+    int tid = n_tasks++;
+    task_t* t = &tasks[tid];
+    uint32_t* kstack = &kstacks[tid][STACK_SIZE];
 
-    push(stack, n_tasks);               // task id (param to entry_point)
-    push(stack, (uint32_t)end_task);    // eip
-    push(stack, 0x202);                 // eflags
-    push(stack, 0x08);                  // cs
-    push(stack, (uint32_t)entry_point); // eip
-    push(stack, 0);                     // error_code
-    push(stack, 0);                     // int_no
-    push(stack, 0);                     // eax
-    push(stack, 0);                     // ecx
-    push(stack, 0);                     // edx
-    push(stack, 0);                     // ebx
-    push(stack, 0);                     // esp
-    push(stack, 0);                     // ebp
-    push(stack, 0);                     // esi
-    push(stack, 0);                     // edi
-    push(stack, 0x10);                  // ds
-    push(stack, 0x10);                  // es
-    push(stack, 0x10);                  // fs
-    push(stack, 0x10);                  // gs
+    push(kstack, tid);                   // task id (param to entry_point)
+    push(kstack, (uint32_t)end_task);    // eip for ret
+    push(kstack, 0x202);                 // eflags
+    push(kstack, 0x08);                  // cs
+    push(kstack, (uint32_t)entry_point); // eip
+    push(kstack, 0);                     // error_code
+    push(kstack, 0);                     // int_no
+    push(kstack, 0);                     // eax
+    push(kstack, 0);                     // ecx
+    push(kstack, 0);                     // edx
+    push(kstack, 0);                     // ebx
+    push(kstack, 0);                     // esp
+    push(kstack, 0);                     // ebp
+    push(kstack, 0);                     // esi
+    push(kstack, 0);                     // edi
+    push(kstack, 0x10);                  // ds
+    push(kstack, 0x10);                  // es
+    push(kstack, 0x10);                  // fs
+    push(kstack, 0x10);                  // gs
 
-    t->esp = (uint32_t)stack;
+    t->esp = (uint32_t)kstack;
+    t->kstack = (uint32_t)&kstacks[tid][STACK_SIZE];
     t->state = NEW;
-    t->id = n_tasks++;
+    t->id = tid;
     t->privilege = 0;
     t->keybuf = create_blocking_queue();
+    strncpy(t->name, name, 32);
+
+  //  print("Created task ");
+  //  print_hex8(t->id);
+  //  print(" state: ");
+  //  print_hex8(t->state);
+  //  print("\n");
 
     add_task(t);
 
     return t;
 }
 
-task_t* create_user_task(void (*entry_point)()) {
-    task_t* t = &tasks[n_tasks];
-    uint32_t* stack = &stacks[n_tasks - 1][STACK_SIZE];
+task_t* create_user_task(const char* name, void (*entry_point)(int)) {
+    int tid = n_tasks++;
+    task_t* t = &tasks[tid];
+    uint32_t* kstack = &kstacks[tid][STACK_SIZE];
+    uint32_t* user_esp = &ustacks[tid][STACK_SIZE];
 
 //    push(stack, n_tasks);               // task id (param to entry_point)
 //    push(stack, (uint32_t)end_task);    // eip
 
-    uint32_t* esp = stack;
-    push(stack, 0x20 | 3);              // ss
-    push(stack, (uint32_t)esp);         // esp
-    push(stack, 0x202);                 // eflags
-    push(stack, 0x18 | 3);              // cs
-    push(stack, (uint32_t)entry_point); // eip
-    push(stack, 0);                     // error_code
-    push(stack, 0);                     // int_no
-    push(stack, 0);                     // eax
-    push(stack, 0);                     // ecx
-    push(stack, 0);                     // edx
-    push(stack, 0);                     // ebx
-    push(stack, 0);                     // esp
-    push(stack, 0);                     // ebp
-    push(stack, 0);                     // esi
-    push(stack, 0);                     // edi
-    push(stack, 0x20 | 3);              // ds
-    push(stack, 0x20 | 3);              // es
-    push(stack, 0x20 | 3);              // fs
-    push(stack, 0x20 | 3);              // gs
+    push(kstack, 0x20 | 3);              // ss
+    push(kstack, (uint32_t)user_esp);    // esp
+    push(kstack, 0x202);                 // eflags
+    push(kstack, 0x18 | 3);              // cs
+    push(kstack, (uint32_t)entry_point); // eip
+    push(kstack, 0);                     // error_code
+    push(kstack, 0);                     // int_no
+    push(kstack, 0);                     // eax
+    push(kstack, 0);                     // ecx
+    push(kstack, 0);                     // edx
+    push(kstack, 0);                     // ebx
+    push(kstack, 0);                     // esp
+    push(kstack, 0);                     // ebp
+    push(kstack, 0);                     // esi
+    push(kstack, 0);                     // edi
+    push(kstack, 0x20 | 3);              // ds
+    push(kstack, 0x20 | 3);              // es
+    push(kstack, 0x20 | 3);              // fs
+    push(kstack, 0x20 | 3);              // gs
 
-    t->esp = (uint32_t)stack;
+    t->esp = (uint32_t)kstack;
+    t->kstack = (uint32_t)&kstacks[tid][STACK_SIZE];
     t->state = NEW;
-    t->id = n_tasks++;
+    t->id = tid;
     t->privilege = 3;
     t->keybuf = create_blocking_queue();
+    strncpy(t->name, name, 32);
 
     add_task(t);
 
@@ -144,8 +174,7 @@ void set_task_state(uint32_t tid, task_state_t state) {
     tasks[tid].state = state;
 }
 
-void tasking_init() {
-    tasks[0].id = n_tasks++;
-    tasks[0].state = RUNNING;
-    tasks[0].next = &tasks[0];
+int get_task_list(task_t** task_list) {
+    *task_list = tasks;
+    return n_tasks;
 }
