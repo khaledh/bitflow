@@ -131,9 +131,8 @@ run: $(BLDDIR)/os.img
 	$(QEMU) \
         -nic none \
         -drive file=$<,format=raw \
-        -display curses \
-        -no-shutdown \
-        -no-reboot # -d int
+        -no-reboot \
+        -display curses
 
 run-window: $(BLDDIR)/os.img
 	$(QEMU) \
